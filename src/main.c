@@ -1,6 +1,7 @@
-#include <stdio.h>
+#include "engine/engine.h"
+#include "game/game.h"
 
 int main(void) {
-    printf("Hello, world!\n");
+    engine_run(game_update);
     return 0;
 }
