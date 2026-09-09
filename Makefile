@@ -9,7 +9,7 @@ BIN = monolith_engine
 all: $(BIN)
 
 $(BIN): $(OBJ)
-    $(CC) $(OBJ) -o $(BIN)
+	$(CC) $(OBJ) -o $(BIN)
 
 clean:
-    rm -f $(OBJ) $(BIN)
+	rm -f $(OBJ) $(BIN)
