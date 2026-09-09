@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude
 
-SRC = $(wildcard src/**/*.c)
+SRC = $(shell find src -name "*.c")
 OBJ = $(SRC:.c=.o)
 
 BIN = monolith_engine
@@ -9,7 +9,7 @@ BIN = monolith_engine
 all: $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) $(OBJ) -o $(BIN)
+    $(CC) $(OBJ) -o $(BIN)
 
 clean:
-	rm -f $(OBJ) $(BIN)
+    rm -f $(OBJ) $(BIN)
