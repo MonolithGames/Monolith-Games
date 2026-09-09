@@ -26,8 +26,8 @@ jobs:
 
     - name: Move binary to build folder
       run: |
-        if not exist build mkdir build
-        copy hello_world.exe build\
+        if (!(Test-Path build)) { New-Item -ItemType Directory -Path build }
+        Copy-Item hello_world.exe build\
 
     - name: Commit build artifact back to repo
       run: |
