@@ -1,4 +1,4 @@
-name: Monolith Engine Build
+name: Hello World Build
 
 on:
   push:
@@ -17,18 +17,18 @@ jobs:
     - name: Install build tools
       run: sudo apt-get update && sudo apt-get install -y build-essential
 
-    - name: Build Monolith Engine
+    - name: Build Hello World
       run: make
 
     - name: Move binary to build folder
       run: |
         mkdir -p build
-        cp monolith_engine build/
+        cp hello_world build/
 
     - name: Commit build artifact back to repo
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
-        git add build/monolith_engine
+        git add build/hello_world
         git commit -m "Automated build update"
         git push
