@@ -1,5 +1,8 @@
 name: Hello World Build
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [ "main" ]
