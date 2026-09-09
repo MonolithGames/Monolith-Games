@@ -2,8 +2,8 @@ CC = gcc
 CFLAGS = -Wall -Wextra
 
 BIN = hello_world
-SRC = main.c
-OBJ = main.o
+SRC = src/main.c
+OBJ = src/main.o
 
 all: $(BIN)
 
