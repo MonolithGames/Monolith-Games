@@ -1,10 +1,9 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude
+CFLAGS = -Wall -Wextra
 
-SRC = $(shell find src -name "*.c")
-OBJ = $(SRC:.c=.o)
-
-BIN = monolith_engine
+BIN = hello_world
+SRC = main.c
+OBJ = main.o
 
 all: $(BIN)
 
