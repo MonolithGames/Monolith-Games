@@ -1,4 +1,4 @@
-name: Hello World Build
+name: Hello World Build (Windows)
 
 permissions:
   contents: write
@@ -11,27 +11,28 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install build tools
-      run: sudo apt-get update && sudo apt-get install -y build-essential
+    - name: Install MinGW (Windows GCC)
+      run: choco install mingw -y
 
-    - name: Build Hello World
-      run: make
+    - name: Build Hello World (Windows .exe)
+      run: |
+        gcc src/main.c -o hello_world.exe
 
     - name: Move binary to build folder
       run: |
-        mkdir -p build
-        cp hello_world build/
+        mkdir build
+        copy hello_world.exe build\
 
     - name: Commit build artifact back to repo
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
-        git add build/hello_world
-        git commit -m "Automated build update"
+        git add build/hello_world.exe
+        git commit -m "Automated Windows build"
         git push
