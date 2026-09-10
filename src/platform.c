@@ -1,6 +1,7 @@
 #include "platform.h"
 #include <windows.h>
 #include <math.h>
+#include <wingdi.h>
 
 #define TOPBAR_HEIGHT 56
 #define TABBAR_HEIGHT 36
@@ -8,14 +9,30 @@
 #define MENU_HEIGHT 40
 #define RELOAD_TIMER 1
 
-static RECT dotsRect, chatRect, reloadRect, addrRect, favRect, accRect, tabRect[3];
+HWND gAddressBar = NULL;
+
+static RECT dotsRect, chatRect, reloadRect, favRect, accRect, tabRect[3];
 static int menuOpen = 0;
 static int reloadSpin = 0;
 static int activeTab = 0;
+static int hoverIndex = -1;
 
 #define BG_R 30
 #define BG_G 30
 #define BG_B 30
+
+// ------------------------------------------------------------
+// Hover detection
+// ------------------------------------------------------------
+void UpdateHoverState(int x, int y)
+{
+    hoverIndex = -1;
+
+    for (int i = 0; i < 3; i++)
+        if (x >= tabRect[i].left && x <= tabRect[i].right &&
+            y >= tabRect[i].top && y <= tabRect[i].bottom)
+            hoverIndex = i;
+}
 
 // ------------------------------------------------------------
 // Draw Reload Icon
@@ -24,10 +41,26 @@ void DrawReloadIcon(HDC hdc, int x, int y, int spin)
 {
     HPEN pen = CreatePen(PS_SOLID, 2, RGB(40, 40, 40));
     SelectObject(hdc, pen);
+
     Arc(hdc, x, y, x + 20, y + 20, x + 10, y, x + 10, y + 20);
     MoveToEx(hdc, x + 10, y, NULL);
     LineTo(hdc, x + 10, y + 5);
+
     DeleteObject(pen);
+}
+
+// ------------------------------------------------------------
+// Draw Fluent Shadow
+// ------------------------------------------------------------
+void DrawFluentShadow(HDC hdc, RECT* rect)
+{
+    TRIVERTEX vertex[2] = {
+        {0, TOPBAR_HEIGHT, RGB(240,240,240), 0, 0},
+        {rect->right, TOPBAR_HEIGHT + 12, RGB(200,200,200), 0, 0}
+    };
+
+    GRADIENT_RECT gRect = {0, 1};
+    GradientFill(hdc, vertex, 2, &gRect, 1, GRADIENT_FILL_RECT_V);
 }
 
 // ------------------------------------------------------------
@@ -54,17 +87,10 @@ void DrawTopBar(HDC hdc, RECT* rect)
     reloadRect.right = 68; reloadRect.bottom = 38;
     DrawReloadIcon(hdc, reloadRect.left, reloadRect.top, reloadSpin);
 
-    addrRect.left = 80; addrRect.top = 12;
-    addrRect.right = rect->right - 300; addrRect.bottom = 44;
-    HBRUSH addrBrush = CreateSolidBrush(RGB(255, 255, 255));
-    SelectObject(hdc, addrBrush);
-    RoundRect(hdc, addrRect.left, addrRect.top, addrRect.right, addrRect.bottom, 10, 10);
-    DeleteObject(addrBrush);
-    DrawText(hdc, "Search or enter address", -1, &addrRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
-
     favRect.left = rect->right - 220; favRect.top = 18;
     accRect.left = rect->right - 180; accRect.top = 18;
     chatRect.left = rect->right - 260; chatRect.top = 18;
+
     TextOut(hdc, favRect.left, favRect.top, "★", 3);
     TextOut(hdc, accRect.left, accRect.top, "👤", 3);
     TextOut(hdc, chatRect.left, chatRect.top, "💬 Chat", 7);
@@ -91,7 +117,6 @@ void DrawTabBar(HDC hdc, RECT* rect)
     DeleteObject(bar);
 
     SetBkMode(hdc, TRANSPARENT);
-    SetTextColor(hdc, RGB(40, 40, 40));
 
     for (int i = 0; i < 3; i++)
     {
@@ -99,6 +124,11 @@ void DrawTabBar(HDC hdc, RECT* rect)
         tabRect[i].top = TOPBAR_HEIGHT + 8;
         tabRect[i].right = tabRect[i].left + 80;
         tabRect[i].bottom = TOPBAR_HEIGHT + 28;
+
+        if (hoverIndex == i)
+            SetTextColor(hdc, RGB(0, 120, 215));
+        else
+            SetTextColor(hdc, RGB(40, 40, 40));
 
         char label[8];
         wsprintf(label, "Tab %d", i + 1);
@@ -117,31 +147,22 @@ void DrawTabBar(HDC hdc, RECT* rect)
     DeleteObject(font);
 }
 
-void SetActiveTab(int index)
-{
-    activeTab = index;
-}
-
 // ------------------------------------------------------------
 // Draw Menu
 // ------------------------------------------------------------
 void DrawMenu(HDC hdc)
 {
     if (!menuOpen) return;
-    RECT menu = {dotsRect.left, dotsRect.bottom + 4, dotsRect.left + MENU_WIDTH, dotsRect.bottom + 4 + MENU_HEIGHT};
+
+    RECT menu = {dotsRect.left, dotsRect.bottom + 4,
+                 dotsRect.left + MENU_WIDTH, dotsRect.bottom + 4 + MENU_HEIGHT};
+
     HBRUSH b = CreateSolidBrush(RGB(255,255,255));
     FillRect(hdc, &menu, b);
     DeleteObject(b);
+
     Rectangle(hdc, menu.left, menu.top, menu.right, menu.bottom);
     TextOut(hdc, menu.left + 10, menu.top + 10, "Settings", 8);
-}
-
-// ------------------------------------------------------------
-// Utility
-// ------------------------------------------------------------
-int PointInRect(RECT* r, int x, int y)
-{
-    return (x >= r->left && x <= r->right && y >= r->top && y <= r->bottom);
 }
 
 // ------------------------------------------------------------
@@ -151,51 +172,30 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 {
     switch (msg)
     {
+    case WM_MOUSEMOVE:
+        UpdateHoverState(LOWORD(lParam), HIWORD(lParam));
+        InvalidateRect(hwnd, NULL, FALSE);
+        break;
+
     case WM_LBUTTONDOWN:
     {
         int x = LOWORD(lParam);
         int y = HIWORD(lParam);
 
-        if (PointInRect(&dotsRect, x, y))
-        {
-            menuOpen = !menuOpen;
-            InvalidateRect(hwnd, NULL, TRUE);
-            return 0;
-        }
-
-        if (menuOpen)
-        {
-            RECT menuItem = {dotsRect.left + 10, dotsRect.bottom + 14, dotsRect.left + 110, dotsRect.bottom + 34};
-            if (PointInRect(&menuItem, x, y))
-            {
-                menuOpen = 0;
-                OpenSettingsWindow((HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE));
-                InvalidateRect(hwnd, NULL, TRUE);
-                return 0;
-            }
-        }
-
-        if (PointInRect(&chatRect, x, y))
-        {
-            OpenChatWindow((HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE));
-            return 0;
-        }
-
         for (int i = 0; i < 3; i++)
-        {
-            if (PointInRect(&tabRect[i], x, y))
+            if (x >= tabRect[i].left && x <= tabRect[i].right &&
+                y >= tabRect[i].top && y <= tabRect[i].bottom)
             {
-                SetActiveTab(i);
+                activeTab = i;
                 InvalidateRect(hwnd, NULL, TRUE);
                 return 0;
             }
-        }
 
-        if (PointInRect(&reloadRect, x, y))
+        if (x >= reloadRect.left && x <= reloadRect.right &&
+            y >= reloadRect.top && y <= reloadRect.bottom)
         {
             reloadSpin = 1;
-            SetTimer(hwnd, RELOAD_TIMER, 
-                                100, NULL);
+            SetTimer(hwnd, RELOAD_TIMER, 100, NULL);
             InvalidateRect(hwnd, NULL, TRUE);
             return 0;
         }
@@ -227,6 +227,7 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         DeleteObject(bg);
 
         DrawTopBar(hdc, &rect);
+        DrawFluentShadow(hdc, &rect);
         DrawTabBar(hdc, &rect);
         DrawMenu(hdc);
 
@@ -236,6 +237,10 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
+
+// ------------------------------------------------------------
+// Create Window
+// ------------------------------------------------------------
 HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
 {
     const char CLASS_NAME[] = "AlphabetMediaWindowClass";
@@ -244,7 +249,6 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
     wc.lpfnWndProc   = Platform_WindowProc;
     wc.hInstance     = instance;
     wc.lpszClassName = CLASS_NAME;
-    wc.hbrBackground = NULL;
 
     RegisterClass(&wc);
 
@@ -262,9 +266,25 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
     );
 
     ShowWindow(hwnd, SW_SHOWMAXIMIZED);
+
+    gAddressBar = CreateWindowEx(
+        WS_EX_CLIENTEDGE,
+        "EDIT",
+        "",
+        WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL,
+        80, 12, 400, 28,
+        hwnd,
+        (HMENU)1001,
+        instance,
+        NULL
+    );
+
     return hwnd;
 }
 
+// ------------------------------------------------------------
+// Message Loop
+// ------------------------------------------------------------
 void Platform_RunMessageLoop(void)
 {
     MSG msg = {0};
