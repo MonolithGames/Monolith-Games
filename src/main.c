@@ -5,6 +5,9 @@
 int main(void) {
     char input[64];
 
+    // Initialize default theme
+    set_theme("default");
+
     printf("Monolith Console\n");
     printf("Type 'help' for commands.\n\n");
 

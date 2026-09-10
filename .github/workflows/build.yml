@@ -1,4 +1,4 @@
-name: Hello World Build (Windows)
+name: Console App Build (Windows)
 
 permissions:
   contents: write
@@ -20,19 +20,18 @@ jobs:
     - name: Install MinGW (Windows GCC)
       run: choco install mingw -y
 
-    - name: Build Hello World (Windows .exe)
-      run: |
-        gcc src/main.c -o hello_world.exe
+    - name: Build Console App (Windows .exe)
+      run: make
 
     - name: Move binary to build folder
       run: |
         if (!(Test-Path build)) { New-Item -ItemType Directory -Path build }
-        Copy-Item hello_world.exe build\
+        Copy-Item console_app.exe build\
 
     - name: Commit build artifact back to repo
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
-        git add build/hello_world.exe
+        git add build/console_app.exe
         git commit -m "Automated Windows build"
         git push
