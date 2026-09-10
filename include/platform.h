@@ -26,4 +26,14 @@ void UpdateHoverState(int x, int y);
 // Address bar
 extern HWND gAddressBar;
 
+// ------------------------------------------------------------
+// Launcher system (NEW)
+// ------------------------------------------------------------
+void DrawLauncher(HDC hdc, RECT* rect);
+void UpdateLauncherClick(int x, int y, HWND hwnd);
+void AnimateLauncher(HWND hwnd);
+
+extern BOOL launcherOpen;
+extern int launcherProgress;
+
 #endif

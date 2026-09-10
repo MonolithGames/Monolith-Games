@@ -8,6 +8,7 @@
 #define MENU_WIDTH 120
 #define MENU_HEIGHT 40
 #define RELOAD_TIMER 1
+#define LAUNCHER_TIMER 99
 
 HWND gAddressBar = NULL;
 
@@ -16,6 +17,9 @@ static int menuOpen = 0;
 static int reloadSpin = 0;
 static int activeTab = 0;
 static int hoverIndex = -1;
+
+BOOL launcherOpen = FALSE;
+int launcherProgress = 0;
 
 #define BG_R 30
 #define BG_G 30
@@ -187,6 +191,101 @@ void DrawMenu(HDC hdc)
 }
 
 // ------------------------------------------------------------
+// Draw Launcher (center circle + animated icons)
+// ------------------------------------------------------------
+void DrawLauncher(HDC hdc, RECT* rect)
+{
+    int centerX = rect->right / 2;
+    int centerY = rect->bottom - 60;
+
+    // Draw center circle
+    HBRUSH white = CreateSolidBrush(RGB(255,255,255));
+    SelectObject(hdc, white);
+    Ellipse(hdc, centerX - 25, centerY - 25, centerX + 25, centerY + 25);
+
+    // Animation radius
+    float radius = 90.0f * (launcherProgress / 100.0f);
+
+    // Icon angles (spread evenly)
+    float angles[5] = { 200, 230, 260, 290, 320 };
+
+    for (int i = 0; i < 5; i++)
+    {
+        float rad = angles[i] * 3.14159f / 180.0f;
+
+        int x = centerX + (int)(radius * cos(rad));
+        int y = centerY - (int)(radius * sin(rad));
+
+        int size = 20;
+
+        // Fade in/out
+        int alpha = (int)(255 * (launcherProgress / 100.0f));
+
+        // Draw icon
+        HDC memDC = CreateCompatibleDC(hdc);
+        HBITMAP bmp = CreateCompatibleBitmap(hdc, size, size);
+        SelectObject(memDC, bmp);
+
+        HBRUSH wb = CreateSolidBrush(RGB(255,255,255));
+        SelectObject(memDC, wb);
+        Ellipse(memDC, 0, 0, size, size);
+
+        BLENDFUNCTION bf = { AC_SRC_OVER, 0, alpha, 0 };
+        AlphaBlend(hdc, x - size/2, y - size/2, size, size,
+                   memDC, 0, 0, size, size, bf);
+
+        DeleteObject(wb);
+        DeleteObject(bmp);
+        DeleteDC(memDC);
+    }
+
+    DeleteObject(white);
+}
+
+// ------------------------------------------------------------
+// Handle Launcher Click
+// ------------------------------------------------------------
+void UpdateLauncherClick(int x, int y, HWND hwnd)
+{
+    RECT rect;
+    GetClientRect(hwnd, &rect);
+
+    int centerX = rect.right / 2;
+    int centerY = rect.bottom - 60;
+
+    // Click detection
+    if (x >= centerX - 25 && x <= centerX + 25 &&
+        y >= centerY - 25 && y <= centerY + 25)
+    {
+        launcherOpen = !launcherOpen;
+        SetTimer(hwnd, LAUNCHER_TIMER, 16, NULL);
+    }
+}
+
+// ------------------------------------------------------------
+// Animate Launcher
+// ------------------------------------------------------------
+void AnimateLauncher(HWND hwnd)
+{
+    if (launcherOpen)
+    {
+        if (launcherProgress < 100)
+            launcherProgress += 5;
+        else
+            KillTimer(hwnd, LAUNCHER_TIMER);
+    }
+    else
+    {
+        if (launcherProgress > 0)
+            launcherProgress -= 5;
+        else
+            KillTimer(hwnd, LAUNCHER_TIMER);
+    }
+
+    InvalidateRect(hwnd, NULL, FALSE);
+}
+
+// ------------------------------------------------------------
 // Window Procedure
 // ------------------------------------------------------------
 LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -203,6 +302,7 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         int x = LOWORD(lParam);
         int y = HIWORD(lParam);
 
+        // Tab clicks
         for (int i = 0; i < 3; i++)
             if (x >= tabRect[i].left && x <= tabRect[i].right &&
                 y >= tabRect[i].top && y <= tabRect[i].bottom)
@@ -212,6 +312,7 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
                 return 0;
             }
 
+        // Reload click
         if (x >= reloadRect.left && x <= reloadRect.right &&
             y >= reloadRect.top && y <= reloadRect.bottom)
         {
@@ -220,6 +321,9 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
             InvalidateRect(hwnd, NULL, TRUE);
             return 0;
         }
+
+        // Launcher click
+        UpdateLauncherClick(x, y, hwnd);
 
         break;
     }
@@ -230,6 +334,10 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
             reloadSpin = 0;
             KillTimer(hwnd, RELOAD_TIMER);
             InvalidateRect(hwnd, NULL, TRUE);
+        }
+        if (wParam == LAUNCHER_TIMER)
+        {
+            AnimateLauncher(hwnd);
         }
         return 0;
 
@@ -251,6 +359,7 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         DrawTabBar(hdc, &rect);
         DrawFluentShadow(hdc, &rect);
         DrawMenu(hdc);
+        DrawLauncher(hdc, &rect);
 
         return 1;
     }
