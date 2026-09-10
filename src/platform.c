@@ -1,8 +1,8 @@
-#include <windows.h>
+#include "platform.h"
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (uMsg)
+    switch (msg)
     {
     case WM_DESTROY:
         PostQuitMessage(0);
@@ -13,7 +13,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
 
-        // Hot pink brush
         HBRUSH brush = CreateSolidBrush(RGB(255, 105, 180));
         FillRect(hdc, &ps.rcPaint, brush);
         DeleteObject(brush);
@@ -22,21 +21,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     }
-    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+
+    return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int nCmdShow)
+HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
 {
-    // Silence unused parameter warnings
-    (void)hPrevInstance;
-    (void)lpCmdLine;
-
     const char CLASS_NAME[] = "AlphabetMediaWindowClass";
 
     WNDCLASS wc = {0};
-    wc.lpfnWndProc   = WindowProc;
-    wc.hInstance     = hInstance;
+    wc.lpfnWndProc   = Platform_WindowProc;
+    wc.hInstance     = instance;
     wc.lpszClassName = CLASS_NAME;
 
     RegisterClass(&wc);
@@ -50,19 +45,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         1280, 720,
         NULL,
         NULL,
-        hInstance,
+        instance,
         NULL
     );
 
-    // Open in bordered fullscreen
     ShowWindow(hwnd, SW_SHOWMAXIMIZED);
+    return hwnd;
+}
 
+void Platform_RunMessageLoop(void)
+{
     MSG msg = {0};
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-
-    return 0;
 }

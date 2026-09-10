@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
-LDFLAGS = -lgdi32
+LDFLAGS = -lgdi32 -mwindows
 
 SRC = src/main.c
 OUT = Alphabet_Media.exe
