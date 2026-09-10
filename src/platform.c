@@ -54,7 +54,7 @@ void DrawReloadIcon(HDC hdc, int x, int y, int spin)
 }
 
 // ------------------------------------------------------------
-// Draw Top Bar (RESTORED)
+// Draw Top Bar
 // ------------------------------------------------------------
 void DrawTopBar(HDC hdc, RECT* rect)
 {
@@ -71,15 +71,12 @@ void DrawTopBar(HDC hdc, RECT* rect)
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, RGB(40, 40, 40));
 
-    // Menu icon
     TextOut(hdc, 12, 18, "☰", 3);
 
-    // Reload icon
     reloadRect.left = 48; reloadRect.top = 18;
     reloadRect.right = 68; reloadRect.bottom = 38;
     DrawReloadIcon(hdc, reloadRect.left, reloadRect.top, reloadSpin);
 
-    // Icons
     favRect.left = rect->right - 220; favRect.top = 18;
     accRect.left = rect->right - 180; accRect.top = 18;
     chatRect.left = rect->right - 260; chatRect.top = 18;
@@ -198,15 +195,12 @@ void DrawLauncher(HDC hdc, RECT* rect)
     int centerX = rect->right / 2;
     int centerY = rect->bottom - 60;
 
-    // Draw center circle
     HBRUSH white = CreateSolidBrush(RGB(255,255,255));
     SelectObject(hdc, white);
     Ellipse(hdc, centerX - 25, centerY - 25, centerX + 25, centerY + 25);
 
-    // Animation radius
     float radius = 90.0f * (launcherProgress / 100.0f);
 
-    // Icon angles (spread evenly)
     float angles[5] = { 200, 230, 260, 290, 320 };
 
     for (int i = 0; i < 5; i++)
@@ -214,14 +208,13 @@ void DrawLauncher(HDC hdc, RECT* rect)
         float rad = angles[i] * 3.14159f / 180.0f;
 
         int x = centerX + (int)(radius * cos(rad));
-        int y = centerY - (int)(radius * sin(rad));
+
+        // ⭐ UPDATED: icons open upward now
+        int y = centerY + (int)(radius * sin(rad));
 
         int size = 20;
-
-        // Fade in/out
         int alpha = (int)(255 * (launcherProgress / 100.0f));
 
-        // Draw icon
         HDC memDC = CreateCompatibleDC(hdc);
         HBITMAP bmp = CreateCompatibleBitmap(hdc, size, size);
         SelectObject(memDC, bmp);
@@ -253,7 +246,6 @@ void UpdateLauncherClick(int x, int y, HWND hwnd)
     int centerX = rect.right / 2;
     int centerY = rect.bottom - 60;
 
-    // Click detection
     if (x >= centerX - 25 && x <= centerX + 25 &&
         y >= centerY - 25 && y <= centerY + 25)
     {
@@ -297,12 +289,15 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         InvalidateRect(hwnd, NULL, FALSE);
         break;
 
+    case WM_SIZE:
+        InvalidateRect(hwnd, NULL, TRUE);
+        break;
+
     case WM_LBUTTONDOWN:
     {
         int x = LOWORD(lParam);
         int y = HIWORD(lParam);
 
-        // Tab clicks
         for (int i = 0; i < 3; i++)
             if (x >= tabRect[i].left && x <= tabRect[i].right &&
                 y >= tabRect[i].top && y <= tabRect[i].bottom)
@@ -312,7 +307,6 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
                 return 0;
             }
 
-        // Reload click
         if (x >= reloadRect.left && x <= reloadRect.right &&
             y >= reloadRect.top && y <= reloadRect.bottom)
         {
@@ -322,9 +316,7 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
             return 0;
         }
 
-        // Launcher click
         UpdateLauncherClick(x, y, hwnd);
-
         break;
     }
 
