@@ -33,10 +33,7 @@ void DrawReloadIcon(HDC hdc, int x, int y, int spin)
     HPEN pen = CreatePen(PS_SOLID, 2, RGB(40, 40, 40));
     SelectObject(hdc, pen);
 
-    // Arc
     Arc(hdc, x, y, x + 20, y + 20, x + 10, y, x + 10, y + 20);
-
-    // Arrow head
     MoveToEx(hdc, x + 10, y, NULL);
     LineTo(hdc, x + 10, y + 5);
 
@@ -56,7 +53,6 @@ void DrawTopBar(HDC hdc, RECT* rect)
     );
     SelectObject(hdc, font);
 
-    // Top bar background
     RECT topbar = {0, 0, rect->right, TOPBAR_HEIGHT};
     HBRUSH bar = CreateSolidBrush(RGB(240, 240, 240));
     FillRect(hdc, &topbar, bar);
@@ -161,7 +157,7 @@ void DrawMenu(HDC hdc)
 int PointInRect(RECT* r, int x, int y)
 {
     return (x >= r->left && x <= r->right &&
-            y >= r->top  && y <= r->bottom);
+            y >= r->top && y <= r->bottom);
 }
 
 // ------------------------------------------------------------
@@ -176,7 +172,6 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         int x = LOWORD(lParam);
         int y = HIWORD(lParam);
 
-        // Three dots menu
         if (PointInRect(&dotsRect, x, y))
         {
             menuOpen = !menuOpen;
@@ -184,7 +179,6 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
             return 0;
         }
 
-        // Settings menu item
         if (menuOpen)
         {
             RECT menuItem = {
@@ -203,14 +197,12 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
             }
         }
 
-        // Chat icon
         if (PointInRect(&chatRect, x, y))
         {
             OpenChatWindow((HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE));
             return 0;
         }
 
-        // Reload icon
         if (PointInRect(&reloadRect, x, y))
         {
             reloadSpin = 1;
@@ -256,7 +248,7 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 }
 
 // ------------------------------------------------------------
-// Create Main Window
+// Create Main Window (taskbar visible)
 // ------------------------------------------------------------
 HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
 {
@@ -274,8 +266,8 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
         0,
         CLASS_NAME,
         "Alphabet Media",
-        WS_POPUP | WS_VISIBLE,
-        0, 0,
+        WS_OVERLAPPEDWINDOW, // Taskbar visible
+        CW_USEDEFAULT, CW_USEDEFAULT,
         1280, 720,
         NULL,
         NULL,
@@ -283,7 +275,7 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
         NULL
     );
 
-    ShowWindow(hwnd, SW_SHOWMAXIMIZED);
+    ShowWindow(hwnd, SW_SHOW);
     return hwnd;
 }
 
@@ -296,6 +288,3 @@ void Platform_RunMessageLoop(void)
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-}
