@@ -7,4 +7,8 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode);
 void Platform_RunMessageLoop(void);
 LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+// Settings window
+void OpenSettingsWindow(HINSTANCE instance);
+LRESULT CALLBACK SettingsWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 #endif

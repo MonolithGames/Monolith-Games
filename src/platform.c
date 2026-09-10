@@ -1,58 +1,94 @@
 #include "platform.h"
 
-// Top bar height
 #define TOPBAR_HEIGHT 48
+#define MENU_WIDTH 120
+#define MENU_HEIGHT 40
+
+// Track menu visibility
+static int menuOpen = 0;
+
+// Track three-dots button area
+RECT dotsRect = {0};
 
 // Background color
 #define BG_R  30
 #define BG_G  30
 #define BG_B  30
 
-void DrawTopBar(HDC hdc, RECT* rect)
+void DrawThreeDots(HDC hdc, int right)
 {
-    // Top bar background
-    RECT topbar = {0, 0, rect->right, TOPBAR_HEIGHT};
-    HBRUSH bar = CreateSolidBrush(RGB(240, 240, 240));
-    FillRect(hdc, &topbar, bar);
-    DeleteObject(bar);
+    dotsRect.left   = right - 360;
+    dotsRect.top    = 14;
+    dotsRect.right  = right - 330;
+    dotsRect.bottom = 34;
 
-    SetBkMode(hdc, TRANSPARENT);
-    SetTextColor(hdc, RGB(40, 40, 40));
+    TextOut(hdc, dotsRect.left, dotsRect.top, "...", 3);
+}
 
-    // Left menu button (three lines)
-    TextOut(hdc, 12, 14, "≡", 3);
+void DrawMenu(HDC hdc, int right)
+{
+    if (!menuOpen) return;
 
-    // Reload icon
-    TextOut(hdc, 48, 14, "⟳", 3);
+    RECT menu = {
+        dotsRect.left,
+        dotsRect.bottom + 4,
+        dotsRect.left + MENU_WIDTH,
+        dotsRect.bottom + 4 + MENU_HEIGHT
+    };
 
-    // Address bar
-    RECT addr = {80, 10, rect->right - 260, 38};
-    HBRUSH addrBrush = CreateSolidBrush(RGB(255, 255, 255));
-    FillRect(hdc, &addr, addrBrush);
-    DeleteObject(addrBrush);
+    HBRUSH b = CreateSolidBrush(RGB(255,255,255));
+    FillRect(hdc, &menu, b);
+    DeleteObject(b);
 
-    DrawText(hdc, "Search or enter address", -1, &addr,
-             DT_SINGLELINE | DT_VCENTER | DT_LEFT);
+    Rectangle(hdc, menu.left, menu.top, menu.right, menu.bottom);
 
-    // Favorites star
-    TextOut(hdc, rect->right - 220, 14, "★", 3);
+    TextOut(hdc, menu.left + 10, menu.top + 10, "Settings", 8);
+}
 
-    // Account icon (circle)
-    TextOut(hdc, rect->right - 180, 14, "👤", 3);
-
-    // Chat button
-    TextOut(hdc, rect->right - 300, 14, "💬 Chat", 7);
-
-    // Tabs
-    TextOut(hdc, rect->right - 140, 14, "Tab 1", 5);
-    TextOut(hdc, rect->right - 90, 14, "Tab 2", 5);
-    TextOut(hdc, rect->right - 40, 14, "Tab 3", 5);
+int PointInRect(RECT* r, int x, int y)
+{
+    return (x >= r->left && x <= r->right &&
+            y >= r->top  && y <= r->bottom);
 }
 
 LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
+    case WM_LBUTTONDOWN:
+    {
+        int x = LOWORD(lParam);
+        int y = HIWORD(lParam);
+
+        if (PointInRect(&dotsRect, x, y))
+        {
+            menuOpen = !menuOpen;
+            InvalidateRect(hwnd, NULL, TRUE);
+            return 0;
+        }
+
+        // If menu is open, detect click on "Settings"
+        if (menuOpen)
+        {
+            RECT menuItem = {
+                dotsRect.left + 10,
+                dotsRect.bottom + 14,
+                dotsRect.left + 110,
+                dotsRect.bottom + 34
+            };
+
+            if (PointInRect(&menuItem, x, y))
+            {
+                menuOpen = 0;
+                OpenSettingsWindow((HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE));
+                InvalidateRect(hwnd, NULL, TRUE);
+                return 0;
+            }
+        }
+
+        break;
+    }
+
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
@@ -69,8 +105,17 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         FillRect(hdc, &rect, bg);
         DeleteObject(bg);
 
-        // Draw top bar
-        DrawTopBar(hdc, &rect);
+        // Top bar
+        RECT topbar = {0, 0, rect.right, TOPBAR_HEIGHT};
+        HBRUSH bar = CreateSolidBrush(RGB(230, 230, 230));
+        FillRect(hdc, &topbar, bar);
+        DeleteObject(bar);
+
+        // Draw three dots
+        DrawThreeDots(hdc, rect.right);
+
+        // Draw menu if open
+        DrawMenu(hdc, rect.right);
 
         return 1;
     }
@@ -95,8 +140,8 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
         0,
         CLASS_NAME,
         "Alphabet Media",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
+        WS_POPUP | WS_VISIBLE,
+        0, 0,
         1280, 720,
         NULL,
         NULL,
