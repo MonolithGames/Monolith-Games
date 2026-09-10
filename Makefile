@@ -1,14 +1,11 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -std=c11
 
-BIN = hello_world
-SRC = src/main.c
-OBJ = src/main.o
+SRC = src/main.c src/commands.c
+OUT = console_app.exe
 
-all: $(BIN)
-
-$(BIN): $(OBJ)
-	$(CC) $(OBJ) -o $(BIN)
+all:
+    $(CC) $(CFLAGS) $(SRC) -o $(OUT)
 
 clean:
-	rm -f $(OBJ) $(BIN)
+    del $(OUT)
