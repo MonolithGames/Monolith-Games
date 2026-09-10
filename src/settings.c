@@ -12,11 +12,9 @@ LRESULT CALLBACK SettingsWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
     {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
-
         SetBkMode(hdc, TRANSPARENT);
         TextOut(hdc, 20, 20, "Settings Window", 15);
-
-        EndPaint(hwnd, &ps);
+        EndPaint(hdc, &ps);
         return 0;
     }
     }
