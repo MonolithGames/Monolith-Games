@@ -31,6 +31,7 @@
 # Executables
 *.exe
 !build/hello_world.exe
+!build/console_app.exe
 *.out
 *.app
 *.i*86
