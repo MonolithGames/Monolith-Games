@@ -50,6 +50,47 @@ void DrawReloadIcon(HDC hdc, int x, int y, int spin)
 }
 
 // ------------------------------------------------------------
+// Draw Top Bar (RESTORED)
+// ------------------------------------------------------------
+void DrawTopBar(HDC hdc, RECT* rect)
+{
+    HFONT font = CreateFont(18, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                            DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI Symbol");
+    SelectObject(hdc, font);
+
+    RECT topbar = {0, 0, rect->right, TOPBAR_HEIGHT};
+    HBRUSH bar = CreateSolidBrush(RGB(240, 240, 240));
+    FillRect(hdc, &topbar, bar);
+    DeleteObject(bar);
+
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(40, 40, 40));
+
+    // Menu icon
+    TextOut(hdc, 12, 18, "☰", 3);
+
+    // Reload icon
+    reloadRect.left = 48; reloadRect.top = 18;
+    reloadRect.right = 68; reloadRect.bottom = 38;
+    DrawReloadIcon(hdc, reloadRect.left, reloadRect.top, reloadSpin);
+
+    // Icons
+    favRect.left = rect->right - 220; favRect.top = 18;
+    accRect.left = rect->right - 180; accRect.top = 18;
+    chatRect.left = rect->right - 260; chatRect.top = 18;
+
+    TextOut(hdc, favRect.left, favRect.top, "★", 3);
+    TextOut(hdc, accRect.left, accRect.top, "👤", 3);
+    TextOut(hdc, chatRect.left, chatRect.top, "💬 Chat", 7);
+
+    dotsRect.left = rect->right - 330; dotsRect.top = 18;
+    TextOut(hdc, dotsRect.left, dotsRect.top, "...", 3);
+
+    DeleteObject(font);
+}
+
+// ------------------------------------------------------------
 // Draw Fluent Shadow
 // ------------------------------------------------------------
 void DrawFluentShadow(HDC hdc, RECT* rect)
