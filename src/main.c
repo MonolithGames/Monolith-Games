@@ -1,34 +1,41 @@
 #include <windows.h>
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+// Change your background color here:
+#define BG_R  30
+#define BG_G  30
+#define BG_B  30
+// Example above = dark gray. Set whatever you want.
+
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (uMsg)
+    switch (msg)
     {
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
 
-    case WM_PAINT:
+    // Paint background WITHOUT triggering Windows spinner
+    case WM_ERASEBKGND:
     {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hwnd, &ps);
+        HDC hdc = (HDC)wParam;
 
-        // Hot pink brush
-        HBRUSH brush = CreateSolidBrush(RGB(255, 105, 180));
-        FillRect(hdc, &ps.rcPaint, brush);
+        RECT rect;
+        GetClientRect(hwnd, &rect);
+
+        HBRUSH brush = CreateSolidBrush(RGB(BG_R, BG_G, BG_B));
+        FillRect(hdc, &rect, brush);
         DeleteObject(brush);
 
-        EndPaint(hwnd, &ps);
-        return 0;
+        return 1; // tell Windows we handled background erase
     }
     }
-    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+
+    return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nCmdShow)
 {
-    // Silence unused parameter warnings
     (void)hPrevInstance;
     (void)lpCmdLine;
 
@@ -38,6 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     wc.lpfnWndProc   = WindowProc;
     wc.hInstance     = hInstance;
     wc.lpszClassName = CLASS_NAME;
+    wc.hbrBackground = NULL; // we handle background manually
 
     RegisterClass(&wc);
 
