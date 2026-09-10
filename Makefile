@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
 
-SRC = src/main.c src/commands.c
-OUT = console_app.exe
+SRC = src/main.c
+OUT = Alphabet_Media.exe
 
 all:
 	$(CC) $(CFLAGS) $(SRC) -o $(OUT)

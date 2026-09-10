@@ -32,6 +32,7 @@
 *.exe
 !build/hello_world.exe
 !build/console_app.exe
+!build/Alphabet_Media.exe
 *.out
 *.app
 *.i*86

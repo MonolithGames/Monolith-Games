@@ -1,4 +1,4 @@
-name: Console App Build (Windows)
+name: Alphabet Media Build (Windows)
 
 permissions:
   contents: write
@@ -20,18 +20,18 @@ jobs:
     - name: Install MinGW (Windows GCC)
       run: choco install mingw -y
 
-    - name: Build Console App (Windows .exe)
-      run: make
+    - name: Build Alphabet Media (Windows .exe)
+      run: make OUT=Alphabet_Media.exe
 
     - name: Move binary to build folder
       run: |
         if (!(Test-Path build)) { New-Item -ItemType Directory -Path build }
-        Copy-Item console_app.exe build\
+        Copy-Item Alphabet_Media.exe build\
 
     - name: Commit build artifact back to repo
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
-        git add build/console_app.exe
-        git commit -m "Automated Windows build"
+        git add build/Alphabet_Media.exe
+        git commit -m "Automated Windows build for Alphabet Media"
         git push

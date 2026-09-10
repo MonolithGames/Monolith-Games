@@ -1,29 +1,62 @@
-#include <stdio.h>
-#include <string.h>
-#include "commands.h"
+#include <windows.h>
 
-int main(void) {
-    char input[64];
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
 
-    // Initialize default theme
-    set_theme("default");
+    case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hwnd, &ps);
 
-    printf("Monolith Console\n");
-    printf("Type 'help' for commands.\n\n");
+        // Hot pink brush
+        HBRUSH brush = CreateSolidBrush(RGB(255, 105, 180));
+        FillRect(hdc, &ps.rcPaint, brush);
+        DeleteObject(brush);
 
-    while (1) {
-        printf("> ");
-        fgets(input, sizeof(input), stdin);
+        EndPaint(hwnd, &ps);
+        return 0;
+    }
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
 
-        // Remove newline
-        input[strcspn(input, "\n")] = 0;
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                   LPSTR lpCmdLine, int nCmdShow)
+{
+    const char CLASS_NAME[] = "MonolithWindowClass";
 
-        if (strcmp(input, "exit") == 0) {
-            printf("Exiting...\n");
-            break;
-        }
+    WNDCLASS wc = {0};
+    wc.lpfnWndProc   = WindowProc;
+    wc.hInstance     = hInstance;
+    wc.lpszClassName = CLASS_NAME;
 
-        handle_command(input);
+    RegisterClass(&wc);
+
+    HWND hwnd = CreateWindowEx(
+        0,
+        CLASS_NAME,
+        "Monolith Engine — Pink Window",
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        1280, 720,
+        NULL,
+        NULL,
+        hInstance,
+        NULL
+    );
+
+    ShowWindow(hwnd, nCmdShow);
+
+    MSG msg = {0};
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
 
     return 0;
