@@ -288,3 +288,6 @@ void Platform_RunMessageLoop(void)
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+}
