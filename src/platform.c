@@ -1,5 +1,10 @@
 #include "platform.h"
 
+// Background color (edit anytime)
+#define BG_R  30
+#define BG_G  30
+#define BG_B  30
+
 LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -8,17 +13,19 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         PostQuitMessage(0);
         return 0;
 
-    case WM_PAINT:
+    // Prevent Windows spinner by drawing background here
+    case WM_ERASEBKGND:
     {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hwnd, &ps);
+        HDC hdc = (HDC)wParam;
 
-        HBRUSH brush = CreateSolidBrush(RGB(255, 105, 180));
-        FillRect(hdc, &ps.rcPaint, brush);
+        RECT rect;
+        GetClientRect(hwnd, &rect);
+
+        HBRUSH brush = CreateSolidBrush(RGB(BG_R, BG_G, BG_B));
+        FillRect(hdc, &rect, brush);
         DeleteObject(brush);
 
-        EndPaint(hwnd, &ps);
-        return 0;
+        return 1;
     }
     }
 
@@ -33,6 +40,7 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
     wc.lpfnWndProc   = Platform_WindowProc;
     wc.hInstance     = instance;
     wc.lpszClassName = CLASS_NAME;
+    wc.hbrBackground = NULL; // we handle background manually
 
     RegisterClass(&wc);
 
