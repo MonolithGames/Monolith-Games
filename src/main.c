@@ -5,7 +5,7 @@
 int main(void) {
     char input[64];
 
-    printf("Monolith Console App\n");
+    printf("Monolith Console\n");
     printf("Type 'help' for commands.\n\n");
 
     while (1) {
