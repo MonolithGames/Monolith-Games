@@ -5,7 +5,7 @@ SRC = src/main.c src/commands.c
 OUT = console_app.exe
 
 all:
-    $(CC) $(CFLAGS) $(SRC) -o $(OUT)
+	$(CC) $(CFLAGS) $(SRC) -o $(OUT)
 
 clean:
-    del $(OUT)
+	del $(OUT)
