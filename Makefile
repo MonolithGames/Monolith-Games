@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
-LDFLAGS = -lgdi32 -mwindows
+LDFLAGS = -lgdi32 -lmsimg32 -mwindows
 
 SRC = src/main.c src/platform.c src/settings.c src/chat.c
 RES = res/AlphabetMedia.rc
