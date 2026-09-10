@@ -1,7 +1,7 @@
 #include <windows.h>
 #include "platform.h"
 
-LRESULT CALLBACK SettingsWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ChatWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
@@ -14,7 +14,7 @@ LRESULT CALLBACK SettingsWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
         HDC hdc = BeginPaint(hwnd, &ps);
 
         SetBkMode(hdc, TRANSPARENT);
-        TextOut(hdc, 20, 20, "Settings Window", 15);
+        TextOut(hdc, 20, 20, "Chat Window", 11);
 
         EndPaint(hwnd, &ps);
         return 0;
@@ -24,12 +24,12 @@ LRESULT CALLBACK SettingsWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-void OpenSettingsWindow(HINSTANCE instance)
+void OpenChatWindow(HINSTANCE instance)
 {
-    const char* CLASS_NAME = "AlphabetMediaSettingsWindow";
+    const char* CLASS_NAME = "AlphabetMediaChatWindow";
 
     WNDCLASS wc = {0};
-    wc.lpfnWndProc = SettingsWindowProc;
+    wc.lpfnWndProc = ChatWindowProc;
     wc.hInstance = instance;
     wc.lpszClassName = CLASS_NAME;
 
@@ -38,10 +38,10 @@ void OpenSettingsWindow(HINSTANCE instance)
     HWND hwnd = CreateWindowEx(
         0,
         CLASS_NAME,
-        "Settings",
+        "Chat",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        600, 450,
+        500, 400,
         NULL,
         NULL,
         instance,

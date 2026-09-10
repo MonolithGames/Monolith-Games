@@ -1,31 +1,85 @@
 #include "platform.h"
 
-#define TOPBAR_HEIGHT 48
+#define TOPBAR_HEIGHT 56
 #define MENU_WIDTH 120
 #define MENU_HEIGHT 40
 
-// Track menu visibility
 static int menuOpen = 0;
+static RECT dotsRect = {0};
+static RECT chatRect = {0};
+static RECT reloadRect = {0};
+static RECT addrRect = {0};
+static RECT favRect = {0};
+static RECT accRect = {0};
+static RECT tabRect[3];
 
-// Track three-dots button area
-RECT dotsRect = {0};
-
-// Background color
 #define BG_R  30
 #define BG_G  30
 #define BG_B  30
 
-void DrawThreeDots(HDC hdc, int right)
+void DrawTopBar(HDC hdc, RECT* rect)
 {
-    dotsRect.left   = right - 360;
-    dotsRect.top    = 14;
-    dotsRect.right  = right - 330;
-    dotsRect.bottom = 34;
+    RECT topbar = {0, 0, rect->right, TOPBAR_HEIGHT};
+    HBRUSH bar = CreateSolidBrush(RGB(240, 240, 240));
+    FillRect(hdc, &topbar, bar);
+    DeleteObject(bar);
 
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(40, 40, 40));
+
+    // Corner button
+    TextOut(hdc, 12, 18, "☰", 3);
+
+    // Reload icon
+    reloadRect.left = 48; reloadRect.top = 18;
+    reloadRect.right = 68; reloadRect.bottom = 38;
+    TextOut(hdc, reloadRect.left, reloadRect.top, "⟳", 3);
+
+    // Address bar
+    addrRect.left = 80; addrRect.top = 12;
+    addrRect.right = rect->right - 300; addrRect.bottom = 44;
+    HBRUSH addrBrush = CreateSolidBrush(RGB(255, 255, 255));
+    FillRect(hdc, &addrRect, addrBrush);
+    DeleteObject(addrBrush);
+    DrawText(hdc, "Search or enter address", -1, &addrRect,
+             DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_CENTER);
+
+    // Favorites
+    favRect.left = rect->right - 220; favRect.top = 18;
+    favRect.right = favRect.left + 20; favRect.bottom = 38;
+    TextOut(hdc, favRect.left, favRect.top, "★", 3);
+
+    // Account icon
+    accRect.left = rect->right - 180; accRect.top = 18;
+    accRect.right = accRect.left + 20; accRect.bottom = 38;
+    TextOut(hdc, accRect.left, accRect.top, "👤", 3);
+
+    // Chat icon
+    chatRect.left = rect->right - 260; chatRect.top = 18;
+    chatRect.right = chatRect.left + 60; chatRect.bottom = 38;
+    TextOut(hdc, chatRect.left, chatRect.top, "💬 Chat", 7);
+
+    // Tabs
+    for (int i = 0; i < 3; i++)
+    {
+        tabRect[i].left = rect->right - (140 - i * 50);
+        tabRect[i].top = 18;
+        tabRect[i].right = tabRect[i].left + 40;
+        tabRect[i].bottom = 38;
+        char label[8];
+        wsprintf(label, "Tab %d", i + 1);
+        TextOut(hdc, tabRect[i].left, tabRect[i].top, label, lstrlen(label));
+    }
+
+    // Three dots
+    dotsRect.left = rect->right - 330;
+    dotsRect.top = 18;
+    dotsRect.right = dotsRect.left + 20;
+    dotsRect.bottom = 38;
     TextOut(hdc, dotsRect.left, dotsRect.top, "...", 3);
 }
 
-void DrawMenu(HDC hdc, int right)
+void DrawMenu(HDC hdc)
 {
     if (!menuOpen) return;
 
@@ -39,9 +93,7 @@ void DrawMenu(HDC hdc, int right)
     HBRUSH b = CreateSolidBrush(RGB(255,255,255));
     FillRect(hdc, &menu, b);
     DeleteObject(b);
-
     Rectangle(hdc, menu.left, menu.top, menu.right, menu.bottom);
-
     TextOut(hdc, menu.left + 10, menu.top + 10, "Settings", 8);
 }
 
@@ -67,7 +119,6 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
             return 0;
         }
 
-        // If menu is open, detect click on "Settings"
         if (menuOpen)
         {
             RECT menuItem = {
@@ -86,6 +137,12 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
             }
         }
 
+        if (PointInRect(&chatRect, x, y))
+        {
+            OpenChatWindow((HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE));
+            return 0;
+        }
+
         break;
     }
 
@@ -96,26 +153,15 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
     case WM_ERASEBKGND:
     {
         HDC hdc = (HDC)wParam;
-
         RECT rect;
         GetClientRect(hwnd, &rect);
 
-        // Background
         HBRUSH bg = CreateSolidBrush(RGB(BG_R, BG_G, BG_B));
         FillRect(hdc, &rect, bg);
         DeleteObject(bg);
 
-        // Top bar
-        RECT topbar = {0, 0, rect.right, TOPBAR_HEIGHT};
-        HBRUSH bar = CreateSolidBrush(RGB(230, 230, 230));
-        FillRect(hdc, &topbar, bar);
-        DeleteObject(bar);
-
-        // Draw three dots
-        DrawThreeDots(hdc, rect.right);
-
-        // Draw menu if open
-        DrawMenu(hdc, rect.right);
+        DrawTopBar(hdc, &rect);
+        DrawMenu(hdc);
 
         return 1;
     }

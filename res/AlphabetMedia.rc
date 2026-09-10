@@ -13,7 +13,7 @@ BEGIN
     BEGIN
         BLOCK "040904E4"
         BEGIN
-            VALUE "CompanyName", "White House 2026 — 1600 Pennsylvania"
+            VALUE "CompanyName", "Monolith Games"
             VALUE "FileDescription", "Alphabet Media Application"
             VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "Alphabet Media"
