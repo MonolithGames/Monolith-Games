@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11
+CFLAGS = -Wall -Wextra -std=c11 -Iinclude
 LDFLAGS = -lgdi32 -mwindows
 
 SRC = src/main.c src/platform.c src/settings.c
@@ -9,11 +9,11 @@ RESOBJ = res/AlphabetMedia.res
 OUT = Alphabet_Media.exe
 
 all: $(RESOBJ)
-	$(CC) $(CFLAGS) $(SRC) $(RESOBJ) -o $(OUT) $(LDFLAGS)
+    $(CC) $(CFLAGS) $(SRC) $(RESOBJ) -o $(OUT) $(LDFLAGS)
 
 $(RESOBJ): $(RES)
-	windres $(RES) -O coff -o $(RESOBJ)
+    windres $(RES) -O coff -o $(RESOBJ)
 
 clean:
-	del $(OUT)
-	del $(RESOBJ)
+    del $(OUT)
+    del $(RESOBJ)
