@@ -1,5 +1,8 @@
 #include "platform.h"
+#include "pipeline.h"
 #include <windows.h>
+#include <commdlg.h>
+#include <shellapi.h>
 #include <math.h>
 #include <wingdi.h>
 
@@ -9,14 +12,33 @@
 #define MENU_HEIGHT 40
 #define RELOAD_TIMER 1
 #define LAUNCHER_TIMER 99
+#define PIPELINE_TIMER 100
 
 HWND gAddressBar = NULL;
+static HWND libraryList = NULL;
+static HWND addMediaButton = NULL;
+static HWND openMediaButton = NULL;
+static HWND buildButton = NULL;
+static HWND publishButton = NULL;
+static HWND statusLabel = NULL;
+
+#define MAX_MEDIA_ITEMS 128
+
+typedef struct
+{
+    char path[MAX_PATH];
+    BOOL favorite;
+} MediaItem;
+
+static MediaItem mediaItems[MAX_MEDIA_ITEMS];
+static int mediaItemCount = 0;
 
 static RECT dotsRect, chatRect, reloadRect, favRect, accRect, tabRect[3];
 static int menuOpen = 0;
 static int reloadSpin = 0;
 static int activeTab = 0;
 static int hoverIndex = -1;
+static char jobStatus[128] = "Ready - select a template to begin";
 
 BOOL launcherOpen = FALSE;
 int launcherProgress = 0;
@@ -24,6 +46,121 @@ int launcherProgress = 0;
 #define BG_R 30
 #define BG_G 30
 #define BG_B 30
+
+static void RefreshLibrary(void)
+{
+    SendMessage(libraryList, LB_RESETCONTENT, 0, 0);
+
+    if (activeTab == 0)
+    {
+        SendMessageA(libraryList, LB_ADDSTRING, 0, (LPARAM)"Skyline Runner | 3D action template");
+        SendMessageA(libraryList, LB_ADDSTRING, 0, (LPARAM)"Neon Kart | Multiplayer racing template");
+        SendMessageA(libraryList, LB_ADDSTRING, 0, (LPARAM)"Pocket Planet | Casual mobile template");
+        return;
+    }
+
+    for (int i = 0; i < mediaItemCount; i++)
+    {
+        if (activeTab == 1 && !mediaItems[i].favorite)
+            continue;
+
+        SendMessage(libraryList, LB_ADDSTRING, 0,
+                    (LPARAM)mediaItems[i].path);
+    }
+}
+
+static void SetJobStatus(const char* status)
+{
+    lstrcpynA(jobStatus, status, sizeof(jobStatus));
+    if (statusLabel)
+        SetWindowTextA(statusLabel, jobStatus);
+}
+
+static void StartTemplateJob(const char* status)
+{
+    if (SendMessage(libraryList, LB_GETCURSEL, 0, 0) == LB_ERR)
+    {
+        SetJobStatus("Select a game template first");
+        return;
+    }
+
+    SetJobStatus(status);
+}
+
+static const char* SelectedTemplateName(void)
+{
+    static char name[128];
+    int selected = (int)SendMessage(libraryList, LB_GETCURSEL, 0, 0);
+
+    if (selected == LB_ERR)
+        return NULL;
+
+    SendMessageA(libraryList, LB_GETTEXT, selected, (LPARAM)name);
+    return name;
+}
+
+static void BuildSelectedTemplate(void)
+{
+    int selected = (int)SendMessage(libraryList, LB_GETCURSEL, 0, 0);
+
+    if (activeTab != 0 || selected == LB_ERR)
+    {
+        SetJobStatus("Select a game template first");
+        return;
+    }
+
+    if (!Pipeline_Start(selected))
+    {
+        SetJobStatus("A pipeline is already running or could not start");
+        return;
+    }
+
+    SetJobStatus(Pipeline_GetStatus());
+    SetTimer(GetParent(libraryList), PIPELINE_TIMER, 1200, NULL);
+}
+
+static void PreparePublishing(void)
+{
+    if (!SelectedTemplateName())
+    {
+        SetJobStatus("Select a game template first");
+        return;
+    }
+
+    SetJobStatus("Publishing checklist created: credentials and store review required");
+}
+
+static void AddMediaFile(HWND hwnd)
+{
+    char path[MAX_PATH] = {0};
+    OPENFILENAMEA dialog = {0};
+
+    dialog.lStructSize = sizeof(dialog);
+    dialog.hwndOwner = hwnd;
+    dialog.lpstrFilter = "Media Files\0*.mp3;*.wav;*.mp4;*.avi;*.mkv;*.jpg;*.png\0All Files\0*.*\0";
+    dialog.lpstrFile = path;
+    dialog.nMaxFile = MAX_PATH;
+    dialog.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+    if (!GetOpenFileNameA(&dialog) || mediaItemCount >= MAX_MEDIA_ITEMS)
+        return;
+
+    lstrcpynA(mediaItems[mediaItemCount].path, path, MAX_PATH);
+    mediaItems[mediaItemCount].favorite = FALSE;
+    mediaItemCount++;
+    RefreshLibrary();
+}
+
+static void OpenSelectedMedia(void)
+{
+    int selected = (int)SendMessage(libraryList, LB_GETCURSEL, 0, 0);
+    if (selected == LB_ERR)
+        return;
+
+    char path[MAX_PATH] = {0};
+    SendMessage(libraryList, LB_GETTEXT, selected, (LPARAM)path);
+    ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWNORMAL);
+}
 
 // ------------------------------------------------------------
 // Hover detection
@@ -71,7 +208,7 @@ void DrawTopBar(HDC hdc, RECT* rect)
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, RGB(40, 40, 40));
 
-    TextOut(hdc, 12, 18, "☰", 3);
+    TextOut(hdc, 12, 18, "Menu", 4);
 
     reloadRect.left = 48; reloadRect.top = 18;
     reloadRect.right = 68; reloadRect.bottom = 38;
@@ -81,9 +218,9 @@ void DrawTopBar(HDC hdc, RECT* rect)
     accRect.left = rect->right - 180; accRect.top = 18;
     chatRect.left = rect->right - 260; chatRect.top = 18;
 
-    TextOut(hdc, favRect.left, favRect.top, "★", 3);
-    TextOut(hdc, accRect.left, accRect.top, "👤", 3);
-    TextOut(hdc, chatRect.left, chatRect.top, "💬 Chat", 7);
+    TextOut(hdc, favRect.left, favRect.top, "Favorites", 9);
+    TextOut(hdc, accRect.left, accRect.top, "Account", 7);
+    TextOut(hdc, chatRect.left, chatRect.top, "Chat", 4);
 
     dotsRect.left = rect->right - 330; dotsRect.top = 18;
     TextOut(hdc, dotsRect.left, dotsRect.top, "...", 3);
@@ -153,7 +290,8 @@ void DrawTabBar(HDC hdc, RECT* rect)
         DrawAcrylicTab(hdc, &tabRect[i], hoverIndex == i, activeTab == i);
 
         SetTextColor(hdc, RGB(40,40,40));
-        DrawText(hdc, activeTab == i ? "Tab Active" : "Tab", -1, &tabRect[i],
+        const char* tabName = i == 0 ? "Library" : i == 1 ? "Favorites" : "Playlists";
+        DrawText(hdc, tabName, -1, &tabRect[i],
                  DT_SINGLELINE | DT_VCENTER | DT_CENTER);
 
         if (activeTab == i)
@@ -290,7 +428,31 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         break;
 
     case WM_SIZE:
+        if (libraryList)
+        {
+            MoveWindow(libraryList, 24, TOPBAR_HEIGHT + TABBAR_HEIGHT + 30,
+                       LOWORD(lParam) - 48, HIWORD(lParam) - TOPBAR_HEIGHT - TABBAR_HEIGHT - 90,
+                       TRUE);
+            MoveWindow(addMediaButton, 24, HIWORD(lParam) - 48, 110, 28, TRUE);
+            MoveWindow(openMediaButton, 144, HIWORD(lParam) - 48, 110, 28, TRUE);
+            MoveWindow(buildButton, 264, HIWORD(lParam) - 48, 110, 28, TRUE);
+            MoveWindow(publishButton, 384, HIWORD(lParam) - 48, 130, 28, TRUE);
+            MoveWindow(statusLabel, 530, HIWORD(lParam) - 48, LOWORD(lParam) - 554, 28, TRUE);
+        }
         InvalidateRect(hwnd, NULL, TRUE);
+        break;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == 2001 && HIWORD(wParam) == BN_CLICKED)
+            AddMediaFile(hwnd);
+        else if (LOWORD(wParam) == 2002 && HIWORD(wParam) == BN_CLICKED)
+            OpenSelectedMedia();
+        else if (LOWORD(wParam) == 2003 && HIWORD(wParam) == LBN_DBLCLK)
+            OpenSelectedMedia();
+        else if (LOWORD(wParam) == 2004 && HIWORD(wParam) == BN_CLICKED)
+            BuildSelectedTemplate();
+        else if (LOWORD(wParam) == 2005 && HIWORD(wParam) == BN_CLICKED)
+            PreparePublishing();
         break;
 
     case WM_LBUTTONDOWN:
@@ -303,6 +465,7 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
                 y >= tabRect[i].top && y <= tabRect[i].bottom)
             {
                 activeTab = i;
+                RefreshLibrary();
                 InvalidateRect(hwnd, NULL, TRUE);
                 return 0;
             }
@@ -330,6 +493,13 @@ LRESULT CALLBACK Platform_WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         if (wParam == LAUNCHER_TIMER)
         {
             AnimateLauncher(hwnd);
+        }
+        if (wParam == PIPELINE_TIMER)
+        {
+            Pipeline_Tick();
+            SetJobStatus(Pipeline_GetStatus());
+            if (!Pipeline_IsRunning())
+                KillTimer(hwnd, PIPELINE_TIMER);
         }
         return 0;
 
@@ -377,7 +547,7 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
     HWND hwnd = CreateWindowEx(
         0,
         CLASS_NAME,
-        "Alphabet Media",
+        "Monolith - Game Production Client",
         WS_OVERLAPPEDWINDOW | WS_MAXIMIZE,
         CW_USEDEFAULT, CW_USEDEFAULT,
         1280, 720,
@@ -400,6 +570,39 @@ HWND Platform_CreateWindow(HINSTANCE instance, int showMode)
         instance,
         NULL
     );
+
+    libraryList = CreateWindowExA(
+        WS_EX_CLIENTEDGE, "LISTBOX", "",
+        WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOTIFY | LBS_NOINTEGRALHEIGHT,
+        24, TOPBAR_HEIGHT + TABBAR_HEIGHT + 30, 800, 500,
+        hwnd, (HMENU)2003, instance, NULL);
+
+    buildButton = CreateWindowExA(
+        0, "BUTTON", "Build",
+        WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+        264, 650, 110, 28, hwnd, (HMENU)2004, instance, NULL);
+
+    publishButton = CreateWindowExA(
+        0, "BUTTON", "Publish Prep",
+        WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+        384, 650, 130, 28, hwnd, (HMENU)2005, instance, NULL);
+
+    statusLabel = CreateWindowExA(
+        0, "STATIC", jobStatus,
+        WS_CHILD | WS_VISIBLE | SS_LEFT,
+        530, 650, 600, 28, hwnd, NULL, instance, NULL);
+
+    RefreshLibrary();
+
+    addMediaButton = CreateWindowExA(
+        0, "BUTTON", "Add Media",
+        WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+        24, 650, 110, 28, hwnd, (HMENU)2001, instance, NULL);
+
+    openMediaButton = CreateWindowExA(
+        0, "BUTTON", "Open",
+        WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+        144, 650, 110, 28, hwnd, (HMENU)2002, instance, NULL);
 
     return hwnd;
 }

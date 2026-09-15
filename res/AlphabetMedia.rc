@@ -1,8 +1,15 @@
 #include <windows.h>
 
+#ifndef MONOLITH_VERSION
+#define MONOLITH_VERSION 1
+#endif
+#define MONOLITH_VERSION_TEXT_2(value) #value
+#define MONOLITH_VERSION_TEXT(value) MONOLITH_VERSION_TEXT_2(value)
+#define MONOLITH_VERSION_STRING MONOLITH_VERSION_TEXT(MONOLITH_VERSION) ".0.0.0"
+
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION MONOLITH_VERSION,0,0,0
+ PRODUCTVERSION MONOLITH_VERSION,0,0,0
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0x0L
  FILEOS 0x40004L
@@ -14,12 +21,12 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName", "Monolith Games"
-            VALUE "FileDescription", "Alphabet Media Application"
-            VALUE "FileVersion", "1.0.0.0"
-            VALUE "InternalName", "Alphabet Media"
-            VALUE "OriginalFilename", "Alphabet_Media.exe"
-            VALUE "ProductName", "Alphabet Media"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "FileDescription", "Monolith Game Production Client"
+            VALUE "FileVersion", MONOLITH_VERSION_STRING
+            VALUE "InternalName", "Monolith"
+            VALUE "OriginalFilename", "Monolith.exe"
+            VALUE "ProductName", "Monolith"
+            VALUE "ProductVersion", MONOLITH_VERSION_STRING
         END
     END
 
