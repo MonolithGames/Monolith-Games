@@ -1,0 +1,2 @@
+Required command: dotnet SDK 10+
+Used by: tools/monolith/monolith.py build web

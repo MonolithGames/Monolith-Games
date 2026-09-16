@@ -1,0 +1,2 @@
+Required commands: clang, clang++
+Used by: Monolith doctor and optional Clang native builds

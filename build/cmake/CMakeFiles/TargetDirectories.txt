@@ -1,0 +1,4 @@
+/workspaces/Monolith-Games/build/cmake/CMakeFiles/monolith_c.dir
+/workspaces/Monolith-Games/build/cmake/CMakeFiles/monolith_cpp.dir
+/workspaces/Monolith-Games/build/cmake/CMakeFiles/edit_cache.dir
+/workspaces/Monolith-Games/build/cmake/CMakeFiles/rebuild_cache.dir

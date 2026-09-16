@@ -1,0 +1,3 @@
+Required command: cmake
+Optional generator: ninja
+Used by: Monolith build cmake

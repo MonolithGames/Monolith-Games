@@ -1,0 +1,2 @@
+Required command: gcc
+Used by: tools/monolith/monolith.py build c

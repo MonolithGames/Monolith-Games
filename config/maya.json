@@ -1,0 +1,5 @@
+{
+  "plugin": "tools/maya/monolith_maya.py",
+  "defaultPhrase": "a city block with cars",
+  "exportFormat": "obj"
+}

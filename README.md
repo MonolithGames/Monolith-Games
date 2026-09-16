@@ -1,5 +1,13 @@
 # Monolith
 
+## Project scope
+
+Monolith is a build and production orchestration platform, not one compiler or
+one game engine. Its active deliverable is the authenticated Blazor production
+desk and API. Its native engine, Maya, Unity, Unreal, and Visual Studio areas
+are integration targets coordinated by the Monolith driver and backed by the
+toolchains installed on the host machine.
+
 Monolith now has a .NET 10 Blazor Web App in `web/Monolith.Web`. It is the
 primary application surface: a server-interactive production dashboard with a
 read-only templates API.
@@ -64,7 +72,10 @@ visualstudio/    Visual Studio C++ and VB project scaffolding
 unity/           Unity metadata and asset workspace
 unreal/          Unreal project metadata and source workspace
 web/             Active .NET 10 Blazor application and tests
-tools/           Build, deployment, and asset utilities
+tools/           Build, deployment, Maya, and asset utilities
+packages/        NuGet, npm, and Unity package scaffolding
+assets/          Art and audio asset boundaries
+sandbox/         Isolated prototype workspaces
 ci/              Cross-platform CI entry points
 devcontainer/    Reproducible Codespaces container setup
 src/include/     Reserved legacy-compatible C layout
@@ -73,3 +84,16 @@ src/include/     Reserved legacy-compatible C layout
 The engine, Unity, Unreal, and Visual Studio areas contain starter files only;
 they are not production integrations yet. The active application remains the
 Blazor project under `web/Monolith.Web`.
+
+## Monolith build driver
+
+The repository includes a command named `Monolith` at
+`tools/monolith/monolith.py`. It is a unified build driver, not a replacement
+for every language compiler. It dispatches to installed GCC, G++, and .NET
+toolchains and reports Unity/Unreal availability without pretending their
+external editors are bundled:
+
+```text
+python3 tools/monolith/monolith.py doctor
+python3 tools/monolith/monolith.py build all
+```
