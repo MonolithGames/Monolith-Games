@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "5JqLP/5vPeY=",
+  "success": true,
+  "projectFilePath": "/workspaces/Monolith-Games/web/Monolith.Web/Monolith.Web.csproj",
+  "expectedPackageFiles": [
+    "/home/codespace/.nuget/packages/microsoft.aspnetcore.app.internal.assets/10.0.11/microsoft.aspnetcore.app.internal.assets.10.0.11.nupkg.sha512"
+  ],
+  "logs": []
+}
