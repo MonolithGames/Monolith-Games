@@ -29,8 +29,8 @@ GET /api/media
 POST /api/media
 ```
 
-The API and dashboard share the in-memory catalog for Skyline Runner, Neon
-Kart, and Pocket Planet.
+The API and dashboard share the catalog for Skyline Runner, Neon Kart, and
+Pocket Planet. Projects and jobs are persisted with SQLite.
 
 ## Local access
 
@@ -56,7 +56,20 @@ dotnet ef migrations add MigrationName --project web/Monolith.Web/Monolith.Web.c
 
 ## Project structure
 
-The repository is prepared for future C work with separate folders for source
-modules, public headers, libraries, resources, tests, documentation, tools,
-examples, scripts, CMake modules, and configuration. Those folders are empty
-scaffolding for a future project; the active application is under `web/`.
+The repository is organized as a multi-technology Monolith studio workspace:
+
+```text
+engine/          C and C++ engine scaffolding
+visualstudio/    Visual Studio C++ and VB project scaffolding
+unity/           Unity metadata and asset workspace
+unreal/          Unreal project metadata and source workspace
+web/             Active .NET 10 Blazor application and tests
+tools/           Build, deployment, and asset utilities
+ci/              Cross-platform CI entry points
+devcontainer/    Reproducible Codespaces container setup
+src/include/     Reserved legacy-compatible C layout
+```
+
+The engine, Unity, Unreal, and Visual Studio areas contain starter files only;
+they are not production integrations yet. The active application remains the
+Blazor project under `web/Monolith.Web`.

@@ -1,4 +1,4 @@
-name: Monolith Windows Build
+name: Monolith Web Build
 
 on:
   push:
@@ -14,19 +14,20 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install MinGW (Windows GCC)
-      run: choco install mingw -y
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
 
-    - name: Build Monolith releases
+    - name: Build Monolith
       shell: pwsh
       run: |
-        make VERSION=1 release
-        make VERSION=2 release
-        make VERSION=5 release
+        dotnet build web/Monolith.Web/Monolith.Web.csproj --configuration Release
+        dotnet test web/Monolith.Web.Tests/Monolith.Web.Tests.csproj --configuration Release
 
-    - name: Upload Monolith releases
+    - name: Upload Monolith web artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: monolith-windows-releases
-        path: build/Monolith_v*.exe
+        name: monolith-web
+        path: web/Monolith.Web/bin/Release/net10.0/
         if-no-files-found: error

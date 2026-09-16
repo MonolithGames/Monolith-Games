@@ -45,6 +45,23 @@
 *.idb
 *.pdb
 
+# Monolith runtime data
+web/Monolith.Web/App_Data/
+
+# .NET build outputs
+web/**/bin/
+web/**/obj/
+
+# Unity generated folders
+unity/Library/
+unity/Temp/
+unity/Logs/
+
+# Unreal generated folders
+unreal/Binaries/
+unreal/Intermediate/
+unreal/Saved/
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd
