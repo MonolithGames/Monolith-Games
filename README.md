@@ -9,6 +9,8 @@ pipeline, a job log, and a JSON manifest for each started job.
 - **Monolith Client**: `src/platform.c` and `src/main.c` provide the Win32 UI.
 - **Pipeline Orchestrator**: `src/pipeline.c` advances the production stages and
 	writes `build/monolith_job.log` and `build/monolith_job.json`.
+- **Adapter Configuration**: `src/config.c` reads the command contract declared
+	in `monolith.env.example`. Empty commands keep an integration disabled.
 - **Template Catalog**: the initial templates are Skyline Runner, Neon Kart,
 	and Pocket Planet.
 - **Azure Worker Adapter**: represented by the Azure pipeline stage; it will
@@ -38,3 +40,19 @@ workflow and its outputs without claiming that Azure, Unity, Maya, payment,
 advertising, multiplayer, or store credentials are configured. Those services
 must be connected and tested on the target Windows worker before production
 publishing is enabled.
+
+## Worker configuration
+
+Set these environment variables on the Windows worker after installing the
+corresponding tools:
+
+```text
+MONOLITH_AZURE_COMMAND
+MONOLITH_MAYA_COMMAND
+MONOLITH_UNITY_COMMAND
+MONOLITH_MEDIA_COMMAND
+MONOLITH_PUBLISH_COMMAND
+```
+
+The client reports an external stage as not configured when its command is
+empty. No credentials belong in the repository or in `monolith.env.example`.

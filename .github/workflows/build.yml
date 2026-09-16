@@ -1,7 +1,4 @@
-name: Alphabet Media Build (Windows)
-
-permissions:
-  contents: write
+name: Monolith Windows Build
 
 on:
   push:
@@ -20,18 +17,16 @@ jobs:
     - name: Install MinGW (Windows GCC)
       run: choco install mingw -y
 
-    - name: Build Alphabet Media (Windows .exe)
-      run: make OUT=Alphabet_Media.exe
-
-    - name: Move binary to build folder
+    - name: Build Monolith releases
+      shell: pwsh
       run: |
-        if (!(Test-Path build)) { New-Item -ItemType Directory -Path build }
-        Copy-Item Alphabet_Media.exe build\
+        make VERSION=1 release
+        make VERSION=2 release
+        make VERSION=5 release
 
-    - name: Commit build artifact back to repo
-      run: |
-        git config user.name "github-actions"
-        git config user.email "actions@github.com"
-        git add build/Alphabet_Media.exe
-        git commit -m "Automated Windows build for Alphabet Media"
-        git push
+    - name: Upload Monolith releases
+      uses: actions/upload-artifact@v4
+      with:
+        name: monolith-windows-releases
+        path: build/Monolith_v*.exe
+        if-no-files-found: error

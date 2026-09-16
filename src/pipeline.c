@@ -1,4 +1,5 @@
 #include "pipeline.h"
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -26,6 +27,8 @@ static PipelineStage currentStage = PIPELINE_IDLE;
 static int currentTemplate = -1;
 static FILE* jobLog = NULL;
 static char statusText[160] = "Ready - select a template to begin";
+static MonolithConfig config;
+static int configLoaded = 0;
 
 static void WriteLog(const char* message)
 {
@@ -57,6 +60,18 @@ static void WriteManifest(void)
     fclose(manifest);
 }
 
+static void FailPipeline(const char* message)
+{
+    currentStage = PIPELINE_FAILED;
+    snprintf(statusText, sizeof(statusText), "Pipeline failed: %s", message);
+    WriteLog(statusText);
+    if (jobLog)
+    {
+        fclose(jobLog);
+        jobLog = NULL;
+    }
+}
+
 const char* Pipeline_TemplateName(int index)
 {
     if (index < 0 || index >= MONOLITH_TEMPLATE_COUNT)
@@ -74,6 +89,11 @@ int Pipeline_Start(int templateIndex)
         return 0;
 
     currentTemplate = templateIndex;
+    if (!configLoaded)
+    {
+        Config_Load(&config);
+        configLoaded = 1;
+    }
     currentStage = PIPELINE_VALIDATING;
     strcpy(statusText, "Validating selected template");
 
@@ -91,7 +111,7 @@ int Pipeline_Start(int templateIndex)
     WriteManifest();
     strcpy(manifest, "Job manifest created for template-driven production");
     WriteLog(manifest);
-    WriteLog("External adapters are staged for configuration");
+    WriteLog("Adapter configuration loaded from MONOLITH_*_COMMAND variables");
     return 1;
 }
 
@@ -103,6 +123,17 @@ int Pipeline_Tick(void)
     if (currentStage < PIPELINE_PUBLISH)
     {
         currentStage = (PipelineStage)(currentStage + 1);
+        if ((currentStage == PIPELINE_AZURE || currentStage == PIPELINE_MAYA ||
+            currentStage == PIPELINE_UNITY || currentStage == PIPELINE_MEDIA ||
+             currentStage == PIPELINE_PUBLISH) &&
+            !Config_IsConfigured(&config, currentStage))
+        {
+            snprintf(statusText, sizeof(statusText),
+                     "%s not configured: set MONOLITH_*_COMMAND",
+                     stageNames[currentStage]);
+            WriteLog(statusText);
+            return 1;
+        }
         snprintf(statusText, sizeof(statusText), "%s: %s",
                  stageNames[currentStage], Pipeline_TemplateName(currentTemplate));
         WriteLog(statusText);
@@ -119,15 +150,21 @@ int Pipeline_Tick(void)
     }
     return 1;
 }
-
-int Pipeline_IsRunning(void)
-{
-    return currentStage >= PIPELINE_VALIDATING && currentStage <= PIPELINE_PUBLISH;
+            if (currentStage == PIPELINE_AZURE || currentStage == PIPELINE_MAYA ||
+                currentStage == PIPELINE_UNITY || currentStage == PIPELINE_MEDIA ||
+                currentStage == PIPELINE_PUBLISH)
 }
+                if (!Config_IsConfigured(&config, currentStage))
+                {
+                    FailPipeline("adapter command not configured");
+                    return 1;
+                }
 
-PipelineStage Pipeline_GetStage(void)
-{
-    return currentStage;
+                if (!Config_RunStage(&config, currentStage, jobLog))
+                {
+                    FailPipeline(stageNames[currentStage]);
+                    return 1;
+                }
 }
 
 const char* Pipeline_GetStatus(void)

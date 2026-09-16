@@ -5,7 +5,7 @@ LDFLAGS = -lgdi32 -lmsimg32 -mwindows
 VERSION ?= 1
 PRODUCT = Monolith
 
-SRC = src/main.c src/platform.c src/pipeline.c src/settings.c src/chat.c
+SRC = src/main.c src/platform.c src/config.c src/pipeline.c src/settings.c src/chat.c
 RES = res/AlphabetMedia.rc
 RESOBJ = build/Monolith.res
 
