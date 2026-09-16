@@ -1,7 +1,81 @@
 ﻿@page "/"
+@using Monolith.Web.Models
+@using Monolith.Web.Services
+@inject TemplateCatalog Catalog
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Monolith / Production desk</PageTitle>
 
-<h1>Hello, world!</h1>
+<section class="dashboard-heading">
+	<div>
+		<p class="eyebrow">MONOLITH / PRODUCTION DESK</p>
+		<h1>Choose what ships next.</h1>
+		<p class="lede">A focused workspace for shaping game concepts into build-ready production jobs.</p>
+	</div>
+	<div class="health-pill"><span></span> Pipeline idle</div>
+</section>
 
-Welcome to your new app.
+<section class="summary-grid" aria-label="Production summary">
+	<div class="summary-card"><span class="summary-label">Templates</span><strong>@Templates.Count</strong><small>Available to start</small></div>
+	<div class="summary-card"><span class="summary-label">Active jobs</span><strong>0</strong><small>No workers running</small></div>
+	<div class="summary-card"><span class="summary-label">Release lane</span><strong>Review</strong><small>Human approval required</small></div>
+</section>
+
+<section class="template-section">
+	<div class="section-heading">
+		<div>
+			<p class="eyebrow">TEMPLATE CATALOG</p>
+			<h2>Production starters</h2>
+		</div>
+		<a class="api-link" href="/api/templates" target="_blank">View API data <span aria-hidden="true">-></span></a>
+	</div>
+
+	<div class="template-grid">
+		@for (var index = 0; index < Templates.Count; index++)
+		{
+			var template = Templates[index];
+			<article class="template-card" style="--accent: @template.Accent">
+				<div class="template-card-top">
+					<span class="template-index">0@(index + 1)</span>
+					<span class="template-status">@template.Status</span>
+				</div>
+				<div class="template-mark">@template.Name.Substring(0, 1)</div>
+				<p class="template-category">@template.Category</p>
+				<h3>@template.Name</h3>
+				<p class="template-description">@template.Description</p>
+				<div class="pipeline-preview">
+					@foreach (var stage in template.Pipeline)
+					{
+						<span>@stage</span>
+					}
+				</div>
+				<button class="launch-button" @onclick="() => SelectTemplate(template)">
+					@(SelectedTemplate?.Slug == template.Slug ? "Selected" : "Select template")
+					<span aria-hidden="true">-></span>
+				</button>
+			</article>
+		}
+	</div>
+</section>
+
+@if (SelectedTemplate is not null)
+{
+	<section class="selection-banner" aria-live="polite">
+		<div><span class="eyebrow">SELECTED TEMPLATE</span><strong>@SelectedTemplate.Name</strong></div>
+		<span>Ready to create a production job</span>
+	</section>
+}
+
+@code {
+	private IReadOnlyList<GameTemplate> Templates = [];
+	private GameTemplate? SelectedTemplate;
+
+	protected override void OnInitialized()
+	{
+		Templates = Catalog.GetAll();
+	}
+
+	private void SelectTemplate(GameTemplate template)
+	{
+		SelectedTemplate = template;
+	}
+}

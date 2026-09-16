@@ -1,5 +1,28 @@
 # Monolith
 
+Monolith now has a .NET 10 Blazor Web App in `web/Monolith.Web`. It is the
+primary application surface: a server-interactive production dashboard with a
+read-only templates API.
+
+Run it from the repository root with:
+
+```text
+dotnet run --project web/Monolith.Web/Monolith.Web.csproj
+```
+
+The API endpoints are:
+
+```text
+GET /api/templates
+GET /api/templates/{slug}
+```
+
+The API and dashboard share the in-memory catalog for Skyline Runner, Neon
+Kart, and Pocket Planet.
+
+The original Win32 client remains in `src/` as a legacy native client while
+the web application is developed.
+
 Monolith is a Windows game-production client organized around template-driven
 jobs. Version 1 provides the native dashboard, template selection, a visible
 pipeline, a job log, and a JSON manifest for each started job.
