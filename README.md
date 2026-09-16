@@ -33,6 +33,15 @@ POST /api/jobs/{id}/approve
 POST /api/jobs/{id}/cancel
 POST /api/jobs/{id}/retry
 GET /api/adapters
+GET /api/settings/coinbase
+GET /api/trading/status
+GET /api/audit
+GET /api/paper/status
+GET /api/paper/orders
+POST /api/paper/orders
+GET /api/coinbase/products
+GET /api/coinbase/accounts
+GET /api/coinbase/portfolios
 GET /api/media
 POST /api/media
 ```
@@ -54,6 +63,17 @@ Jobs are persisted in the SQLite database at `App_Data/monolith.db`, and
 uploaded media is stored under `App_Data/Media`.
 Adapter readiness is reported from the `MONOLITH_*_COMMAND` environment
 variables when those integrations are configured.
+
+Coinbase production credentials can be entered at `/settings`. The API key
+name and private key are encrypted before storage. The Coinbase workspace at
+`/coinbase` currently supports read-only products, accounts, balances, and
+portfolio requests. Order booking and withdrawals are disabled until a later
+audited implementation.
+
+The web app is PWA-ready with an install manifest, service worker, offline
+fallback, and a black Monolith app icon. Job history refreshes automatically
+while the page is open. Health checks are available at `/health`; login and
+media upload endpoints are rate-limited.
 
 Database schema changes use EF Core migrations. After changing the data model,
 create a migration with:

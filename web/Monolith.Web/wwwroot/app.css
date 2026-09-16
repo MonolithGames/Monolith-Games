@@ -87,7 +87,29 @@ a, .btn-link {
 .project-row { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
 .project-row small { display: block; margin-top: .3rem; color: var(--muted); font: .68rem 'DM Mono', monospace; }
 .project-row > span { max-width: 45%; color: var(--muted); font-size: .85rem; text-align: right; }
+.project-row-link { color: inherit; text-decoration: none; }
+.project-row-link:hover { background: #1a1a1a; }
 .job-actions { display: flex; flex-wrap: wrap; gap: .35rem; }
+.project-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.detail-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: 1rem; margin-bottom: 1rem; }
+.detail-job-row { display: grid; grid-template-columns: minmax(150px, .8fr) minmax(100px, 1fr) auto; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+.detail-job-row small, .timeline-row small { display: block; margin-top: .3rem; color: var(--muted); font: .68rem 'DM Mono', monospace; }
+.timeline-row { display: flex; gap: .8rem; padding: .75rem 0; border-top: 1px solid var(--line); }
+.timeline-row > span { flex: 0 0 7px; width: 7px; height: 7px; margin-top: .35rem; border-radius: 50%; background: #fff; }
+.project-files-panel { margin-bottom: 2rem; }
+.settings-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 1rem; }
+.settings-heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+.settings-status { color: #fff; font: .68rem 'DM Mono', monospace; }
+.settings-check { display: flex !important; grid-template-columns: none !important; align-items: center; gap: .6rem !important; }
+.settings-check input { width: auto !important; }
+.settings-success { margin-top: 1rem; color: #fff; font: .72rem 'DM Mono', monospace; }
+.settings-note { min-height: 220px; }
+.coinbase-refresh { width: auto; min-width: 170px; border-top: 0; padding: .7rem .9rem; background: #fff; color: #000; }
+.coinbase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.json-output { max-height: 420px; overflow: auto; margin: 0; padding: 1rem; background: #050505; color: #ddd; font: .68rem/1.5 'DM Mono', monospace; white-space: pre-wrap; }
+.product-panel { margin-bottom: 2rem; }
+.file-grid { display: flex; flex-wrap: wrap; gap: .5rem; }
+.file-grid span { padding: .5rem .65rem; background: #202020; color: #ddd; font: .68rem 'DM Mono', monospace; }
 .login-shell { display: grid; place-items: center; min-height: 65vh; }
 .login-panel { width: min(100%, 480px); padding: 2.5rem; background: #101010; border-top: 3px solid #fff; }
 .login-panel h1 { margin: .4rem 0 .7rem; font-size: 3rem; }
@@ -127,6 +149,11 @@ a, .btn-link {
     .selection-banner { align-items: start; flex-direction: column; }
     .operations-grid { grid-template-columns: 1fr; }
     .project-layout { grid-template-columns: 1fr; }
+    .settings-layout { grid-template-columns: 1fr; }
+    .coinbase-grid { grid-template-columns: 1fr; }
+    .project-metrics { grid-template-columns: 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .detail-job-row { grid-template-columns: 1fr; }
     .project-row { display: block; }
     .project-row > span { display: block; max-width: none; margin-top: .5rem; text-align: left; }
     .job-row, .jobs-table-head, .jobs-table-row { grid-template-columns: 1fr 1fr; }

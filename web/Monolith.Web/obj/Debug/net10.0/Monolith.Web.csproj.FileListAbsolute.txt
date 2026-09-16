@@ -257,4 +257,14 @@
 /workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 /workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 /workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/runtimes/win/lib/net9.0/System.Windows.Extensions.dll
-/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/kqojuygjzk-{0}-logl8f7j15-logl8f7j15.gz
+/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/h95gk40r15-{0}-qnflsbqsav-qnflsbqsav.gz
+/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/7sbrkfp4n0-{0}-amhelr9tmp-amhelr9tmp.gz
+/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/obvaklr9wt-{0}-5yfpzh6148-5yfpzh6148.gz
+/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/8vf5j39eaj-{0}-nospuo9yjn-nospuo9yjn.gz
+/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/va8yxw7fa7-{0}-5oafnjbl1w-5oafnjbl1w.gz
+/workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/Microsoft.IdentityModel.Abstractions.dll
+/workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/Microsoft.IdentityModel.Logging.dll
+/workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
+/workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
+/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/kqojuygjzk-{0}-bdax1ngbgv-bdax1ngbgv.gz

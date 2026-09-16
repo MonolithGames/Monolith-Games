@@ -24,6 +24,23 @@ public sealed class WorkspaceStore(IDbContextFactory<MonolithDbContext> dbFactor
                 project.Description, project.CreatedAtUtc)).ToArray();
     }
 
+    public Project? GetProject(Guid id)
+    {
+        using var db = dbFactory.CreateDbContext();
+        return db.Projects.AsNoTracking().Where(project => project.Id == id)
+            .Select(project => new Project(project.Id, project.Name, project.Slug, project.TemplateSlug,
+                project.Description, project.CreatedAtUtc)).FirstOrDefault();
+    }
+
+    public IReadOnlyList<ProductionJob> GetProjectJobs(Guid projectId)
+    {
+        using var db = dbFactory.CreateDbContext();
+        return db.Jobs.AsNoTracking().Where(job => job.ProjectId == projectId)
+            .OrderByDescending(job => job.UpdatedAtUtc)
+            .Select(job => new ProductionJob(job.Id, job.ProjectId, job.TemplateSlug, job.TemplateName,
+                job.Status, job.Progress, job.CreatedAtUtc, job.UpdatedAtUtc)).ToArray();
+    }
+
     public Project? CreateProject(string name, string templateSlug, string description)
     {
         var template = catalog.GetBySlug(templateSlug);

@@ -29,7 +29,7 @@
         @if (ProjectItems.Count == 0) { <p class="muted-copy">No projects created yet.</p> }
         @foreach (var project in ProjectItems)
         {
-            <div class="project-row"><div><strong>@project.Name</strong><small>@project.TemplateSlug · @project.CreatedAtUtc.ToLocalTime().ToString("MMM d, yyyy")</small></div><span>@project.Description</span></div>
+            <a class="project-row project-row-link" href="/projects/@project.Id"><div><strong>@project.Name</strong><small>@project.TemplateSlug · @project.CreatedAtUtc.ToLocalTime().ToString("MMM d, yyyy")</small></div><span>@project.Description</span></a>
         }
     </article>
 </section>

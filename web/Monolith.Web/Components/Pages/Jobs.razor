@@ -1,5 +1,6 @@
 @page "/jobs"
 @attribute [Authorize]
+@implements IAsyncDisposable
 @using Monolith.Web.Models
 @using Monolith.Web.Services
 @inject WorkspaceStore Workspace
@@ -24,8 +25,13 @@
 
 @code {
     private IReadOnlyList<ProductionJob> JobItems = [];
+    private readonly CancellationTokenSource refreshCancellation = new();
 
-    protected override void OnInitialized() => Refresh();
+    protected override void OnInitialized()
+    {
+        Refresh();
+        _ = RefreshLoopAsync();
+    }
 
     private void Advance(Guid id)
     {
@@ -46,4 +52,30 @@
     }
 
     private void Refresh() => JobItems = Workspace.GetJobs();
+
+    private async Task RefreshLoopAsync()
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(refreshCancellation.Token))
+            {
+                await InvokeAsync(() =>
+                {
+                    Refresh();
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (OperationCanceledException) when (refreshCancellation.IsCancellationRequested)
+        {
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        refreshCancellation.Cancel();
+        refreshCancellation.Dispose();
+        return ValueTask.CompletedTask;
+    }
 }

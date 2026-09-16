@@ -183,3 +183,8 @@
 /workspaces/Monolith-Games/web/Monolith.Web.Tests/obj/Debug/net10.0/Monolith.Web.Tests.pdb
 /workspaces/Monolith-Games/web/Monolith.Web.Tests/obj/Debug/net10.0/Monolith.Web.Tests.genruntimeconfig.cache
 /workspaces/Monolith-Games/web/Monolith.Web.Tests/obj/Debug/net10.0/ref/Monolith.Web.Tests.dll
+/workspaces/Monolith-Games/web/Monolith.Web.Tests/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
+/workspaces/Monolith-Games/web/Monolith.Web.Tests/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
+/workspaces/Monolith-Games/web/Monolith.Web.Tests/bin/Debug/net10.0/Microsoft.IdentityModel.Logging.dll
+/workspaces/Monolith-Games/web/Monolith.Web.Tests/bin/Debug/net10.0/Microsoft.IdentityModel.Abstractions.dll
+/workspaces/Monolith-Games/web/Monolith.Web.Tests/bin/Debug/net10.0/Microsoft.IdentityModel.JsonWebTokens.dll
