@@ -12,7 +12,7 @@ public sealed class TemplateCatalog
             "3D action",
             "A rooftop chase built around quick movement, vertical level design, and precise combat.",
             "Ready for production",
-            "#e56b52",
+            "#ffffff",
             ["Validate", "Maya assets", "Unity build", "Quality check", "Package"]),
         new(
             "neon-kart",
@@ -20,7 +20,7 @@ public sealed class TemplateCatalog
             "Multiplayer racing",
             "A bright arcade racer with short competitive sessions and a strong social loop.",
             "Adapter review needed",
-            "#33a6a8",
+            "#bdbdbd",
             ["Validate", "Maya assets", "Unity build", "Network QA", "Package"]),
         new(
             "pocket-planet",
@@ -28,7 +28,7 @@ public sealed class TemplateCatalog
             "Casual mobile",
             "A friendly collection game designed for quick sessions, readable goals, and mobile touch input.",
             "Ready for production",
-            "#d79a3d",
+            "#777777",
             ["Validate", "Maya assets", "Unity build", "Device QA", "Package"])
     ];
 

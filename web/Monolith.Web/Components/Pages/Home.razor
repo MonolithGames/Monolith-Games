@@ -1,7 +1,9 @@
 ﻿@page "/"
+@attribute [Authorize]
 @using Monolith.Web.Models
 @using Monolith.Web.Services
 @inject TemplateCatalog Catalog
+@inject WorkspaceStore Workspace
 
 <PageTitle>Monolith / Production desk</PageTitle>
 
@@ -16,9 +18,20 @@
 
 <section class="summary-grid" aria-label="Production summary">
 	<div class="summary-card"><span class="summary-label">Templates</span><strong>@Templates.Count</strong><small>Available to start</small></div>
-	<div class="summary-card"><span class="summary-label">Active jobs</span><strong>0</strong><small>No workers running</small></div>
+	<div class="summary-card"><span class="summary-label">Active jobs</span><strong>@Jobs.Count(job => job.Status is "Queued" or "Running pipeline")</strong><small>Local jobs in progress</small></div>
 	<div class="summary-card"><span class="summary-label">Release lane</span><strong>Review</strong><small>Human approval required</small></div>
 </section>
+
+@if (Jobs.Count > 0)
+{
+	<section class="jobs-strip">
+		<div class="section-heading"><div><p class="eyebrow">RECENT JOBS</p><h2>Production queue</h2></div><a class="api-link" href="/jobs">Open history <span aria-hidden="true">-></span></a></div>
+		@foreach (var job in Jobs.Take(3))
+		{
+			<div class="job-row"><div><strong>@job.TemplateName</strong><small>@job.CreatedAtUtc.ToLocalTime().ToString("MMM d, h:mm tt")</small></div><span class="job-status">@job.Status</span><div class="job-progress"><i style="width: @job.Progress%"></i></div></div>
+		}
+	</section>
+}
 
 <section class="template-section">
 	<div class="section-heading">
@@ -48,8 +61,8 @@
 						<span>@stage</span>
 					}
 				</div>
-				<button class="launch-button" @onclick="() => SelectTemplate(template)">
-					@(SelectedTemplate?.Slug == template.Slug ? "Selected" : "Select template")
+				<button class="launch-button" @onclick="() => CreateJob(template)">
+					@(SelectedTemplate?.Slug == template.Slug ? "Job created" : "Create production job")
 					<span aria-hidden="true">-></span>
 				</button>
 			</article>
@@ -68,14 +81,23 @@
 @code {
 	private IReadOnlyList<GameTemplate> Templates = [];
 	private GameTemplate? SelectedTemplate;
+	private IReadOnlyList<ProductionJob> Jobs = [];
 
 	protected override void OnInitialized()
 	{
 		Templates = Catalog.GetAll();
+		Jobs = Workspace.GetJobs();
 	}
 
 	private void SelectTemplate(GameTemplate template)
 	{
 		SelectedTemplate = template;
+	}
+
+	private void CreateJob(GameTemplate template)
+	{
+		SelectedTemplate = template;
+		Workspace.CreateJob(template.Slug);
+		Jobs = Workspace.GetJobs();
 	}
 }

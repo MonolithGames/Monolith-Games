@@ -7,7 +7,13 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <AuthorizeView>
+                <Authorized Context="authState">
+                    <span>@authState.User.Identity?.Name</span>
+                </Authorized>
+                <NotAuthorized><span>Guest</span></NotAuthorized>
+            </AuthorizeView>
+            <form method="post" action="/api/auth/logout"><button type="submit">Sign out</button></form>
         </div>
 
         <article class="content px-4">
@@ -15,6 +21,7 @@
         </article>
     </main>
 </div>
+
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.

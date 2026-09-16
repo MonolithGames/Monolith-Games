@@ -15,67 +15,48 @@ The API endpoints are:
 ```text
 GET /api/templates
 GET /api/templates/{slug}
+GET /api/jobs
+POST /api/jobs
+GET /api/projects
+POST /api/projects
+GET /api/jobs/{id}/logs
+POST /api/jobs/{id}/advance
+POST /api/jobs/{id}/approve
+POST /api/jobs/{id}/cancel
+POST /api/jobs/{id}/retry
+GET /api/adapters
+GET /api/media
+POST /api/media
 ```
 
 The API and dashboard share the in-memory catalog for Skyline Runner, Neon
 Kart, and Pocket Planet.
 
-The original Win32 client remains in `src/` as a legacy native client while
-the web application is developed.
+## Local access
 
-Monolith is a Windows game-production client organized around template-driven
-jobs. Version 1 provides the native dashboard, template selection, a visible
-pipeline, a job log, and a JSON manifest for each started job.
-
-## Project boundaries
-
-- **Monolith Client**: `src/platform.c` and `src/main.c` provide the Win32 UI.
-- **Pipeline Orchestrator**: `src/pipeline.c` advances the production stages and
-	writes `build/monolith_job.log` and `build/monolith_job.json`.
-- **Adapter Configuration**: `src/config.c` reads the command contract declared
-	in `monolith.env.example`. Empty commands keep an integration disabled.
-- **Template Catalog**: the initial templates are Skyline Runner, Neon Kart,
-	and Pocket Planet.
-- **Azure Worker Adapter**: represented by the Azure pipeline stage; it will
-	connect to a configured Windows VM in a later integration.
-- **Maya Adapter**: represented by the Maya stage; it will run configured Maya
-	scripts when Maya is installed on the worker.
-- **Unity Adapter**: represented by the Unity stage; it will invoke a Unity
-	batch build against the selected template.
-- **Publishing Adapter**: represented by media and publishing-approval stages.
-	Store credentials and a human release approval are required before adding
-	real store API calls.
-
-## Build releases
-
-On the Windows build environment with MinGW and `windres` installed:
+Authentication uses a production-safe environment secret. Set the account
+password before starting the app:
 
 ```text
-make VERSION=1 release
-make VERSION=2 release
+AUORA_PASSWORD=replace-with-a-secret dotnet run --project web/Monolith.Web/Monolith.Web.csproj
 ```
 
-The resulting files are `build/Monolith_v1.exe` and `build/Monolith_v2.exe`.
-The embedded Windows product version follows the requested version number.
+The account name is `auora`. The password is never stored in the repository.
+Jobs are persisted in the SQLite database at `App_Data/monolith.db`, and
+uploaded media is stored under `App_Data/Media`.
+Adapter readiness is reported from the `MONOLITH_*_COMMAND` environment
+variables when those integrations are configured.
 
-The current pipeline is deliberately adapter-aware: it records the complete
-workflow and its outputs without claiming that Azure, Unity, Maya, payment,
-advertising, multiplayer, or store credentials are configured. Those services
-must be connected and tested on the target Windows worker before production
-publishing is enabled.
-
-## Worker configuration
-
-Set these environment variables on the Windows worker after installing the
-corresponding tools:
+Database schema changes use EF Core migrations. After changing the data model,
+create a migration with:
 
 ```text
-MONOLITH_AZURE_COMMAND
-MONOLITH_MAYA_COMMAND
-MONOLITH_UNITY_COMMAND
-MONOLITH_MEDIA_COMMAND
-MONOLITH_PUBLISH_COMMAND
+dotnet ef migrations add MigrationName --project web/Monolith.Web/Monolith.Web.csproj --startup-project web/Monolith.Web/Monolith.Web.csproj --output-dir Data/Migrations
 ```
 
-The client reports an external stage as not configured when its command is
-empty. No credentials belong in the repository or in `monolith.env.example`.
+## Project structure
+
+The repository is prepared for future C work with separate folders for source
+modules, public headers, libraries, resources, tests, documentation, tools,
+examples, scripts, CMake modules, and configuration. Those folders are empty
+scaffolding for a future project; the active application is under `web/`.
