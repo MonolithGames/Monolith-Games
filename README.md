@@ -18,6 +18,17 @@ Run it from the repository root with:
 dotnet run --project web/Monolith.Web/Monolith.Web.csproj
 ```
 
+For the reproducible local staging runtime, use the same container image that
+will later be deployed to Azure:
+
+```text
+cp .env.local.example .env.local
+./scripts/local-up.sh
+```
+
+Open `http://127.0.0.1:5187`. See [docs/local-deployment.md](docs/local-deployment.md)
+for health checks and shutdown commands.
+
 The API endpoints are:
 
 ```text

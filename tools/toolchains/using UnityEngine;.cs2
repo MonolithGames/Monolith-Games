@@ -1,0 +1,122 @@
+using UnityEngine;
+
+public class CameraController : MonoBehaviour
+{
+    [Header("Target")]
+    public Transform target;
+    public Vector3 offset = new Vector3(0f, 5f, -10f);
+
+    [Header("Movement")]
+    public float followSpeed = 5f;
+    public float rotationSpeed = 5f;
+
+    [Header("Zoom")]
+    public float zoomSpeed = 4f;
+    public float minZoom = 3f;
+    public float maxZoom = 15f;
+    public float zoomSmoothTime = 0.15f;
+
+    [Header("Orbit")]
+    public bool allowOrbit = true;
+    public float orbitSpeed = 120f;
+    public float minPitch = -20f;
+    public float maxPitch = 80f;
+
+    [Header("Collision")]
+    public bool avoidObstacles = true;
+    public LayerMask collisionMask = ~0;
+    public float collisionRadius = 0.3f;
+    public float collisionOffset = 0.2f;
+
+    private float currentZoom;
+    private float targetZoom;
+    private float zoomVelocity;
+    private float yaw;
+    private float pitch;
+
+    private void Start()
+    {
+        currentZoom = offset.magnitude;
+        targetZoom = currentZoom;
+
+        Vector3 angles = transform.eulerAngles;
+        yaw = angles.y;
+        pitch = angles.x;
+    }
+
+    private void LateUpdate()
+    {
+        if (target == null)
+            return;
+
+        HandleZoomInput();
+        HandleOrbitInput();
+        FollowTarget();
+        LookAtTarget();
+    }
+
+    private void HandleZoomInput()
+    {
+        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+        if (Mathf.Abs(scrollInput) > 0.0001f)
+        {
+            targetZoom -= scrollInput * zoomSpeed;
+            targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
+        }
+
+        currentZoom = Mathf.SmoothDamp(currentZoom, targetZoom, ref zoomVelocity, zoomSmoothTime);
+    }
+
+    private void HandleOrbitInput()
+    {
+        if (!allowOrbit)
+            return;
+
+        if (Input.GetMouseButton(1))
+        {
+            float mouseX = Input.GetAxis("Mouse X");
+            float mouseY = Input.GetAxis("Mouse Y");
+
+            yaw += mouseX * orbitSpeed * Time.deltaTime;
+            pitch -= mouseY * orbitSpeed * Time.deltaTime;
+            pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+        }
+    }
+
+    private void FollowTarget()
+    {
+        Quaternion orbitRotation = Quaternion.Euler(pitch, yaw, 0f);
+        Vector3 desiredOffset = orbitRotation * new Vector3(0f, 0f, -currentZoom);
+        Vector3 desiredPosition = target.position + desiredOffset;
+
+        if (avoidObstacles)
+        {
+            desiredPosition = HandleCollision(target.position, desiredPosition);
+        }
+
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, followSpeed * Time.deltaTime);
+    }
+
+    private Vector3 HandleCollision(Vector3 origin, Vector3 desiredPosition)
+    {
+        Vector3 direction = desiredPosition - origin;
+        float distance = direction.magnitude;
+
+        if (Physics.SphereCast(origin, collisionRadius, direction.normalized, out RaycastHit hit, distance, collisionMask))
+        {
+            float adjustedDistance = Mathf.Max(hit.distance - collisionOffset, minZoom);
+            return origin + direction.normalized * adjustedDistance;
+        }
+
+        return desiredPosition;
+    }
+
+    private void LookAtTarget()
+    {
+        Quaternion desiredRotation = Quaternion.LookRotation(target.position - transform.position);
+        transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, rotationSpeed * Time.deltaTime);
+    }
+}
+
+</newString>
+</invoke>

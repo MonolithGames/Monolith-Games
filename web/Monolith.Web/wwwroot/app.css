@@ -16,6 +16,13 @@ html, body {
     color-scheme: dark;
 }
 
+body { background: radial-gradient(circle at 76% -10%, #1c1c1c 0, #050505 38rem); }
+.reveal { animation: reveal .55s cubic-bezier(.2,.75,.25,1) both; }
+.reveal-1 { animation-delay: 40ms; }
+.reveal-2 { animation-delay: 100ms; }
+.reveal-3 { animation-delay: 160ms; }
+@keyframes reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
 a, .btn-link {
     color: #ffffff;
 }
@@ -42,9 +49,12 @@ a, .btn-link {
 .dashboard-heading h1 { max-width: 650px; margin: .35rem 0 .8rem; font-size: clamp(2.4rem, 5vw, 5.1rem); line-height: .98; letter-spacing: 0; }
 .lede { max-width: 540px; margin: 0; color: var(--muted); font-size: 1.05rem; }
 .health-pill { border: 1px solid var(--line); border-radius: 999px; padding: .65rem .95rem; font: 500 .72rem 'DM Mono', monospace; white-space: nowrap; }
+.heading-signals { display: grid; justify-items: end; gap: .65rem; }
+.updated-signal { color: var(--muted); font: .65rem 'DM Mono', monospace; }
 .health-pill span { display: inline-block; width: 7px; height: 7px; margin-right: .45rem; border-radius: 50%; background: #fff; }
 .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 4.5rem; }
-.summary-card { padding: 1.25rem 1.4rem; border-top: 2px solid #fff; background: #101010; }
+.summary-card { position: relative; overflow: hidden; padding: 1.25rem 1.4rem; border-top: 2px solid #fff; background: #101010; }
+.summary-rule { display: block; width: 28%; height: 2px; margin-top: 1.2rem; background: #fff; opacity: .45; }
 .summary-card strong { display: block; margin: .4rem 0 .2rem; font-size: 1.7rem; }
 .summary-card small { color: var(--muted); }
 .section-heading { align-items: end; margin-bottom: 1.3rem; }
@@ -53,6 +63,7 @@ a, .btn-link {
 .template-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 .template-card { position: relative; display: flex; flex-direction: column; min-height: 420px; padding: 1.35rem; border: 1px solid var(--line); background: #101010; transition: transform .2s ease, box-shadow .2s ease; }
 .template-card:hover { transform: translateY(-4px); box-shadow: 8px 8px 0 #fff; }
+.template-card { animation: reveal .55s cubic-bezier(.2,.75,.25,1) both; animation-delay: var(--delay); }
 .template-card-top { align-items: center; color: var(--muted); font: 500 .68rem 'DM Mono', monospace; }
 .template-status { color: var(--deep-green); }
 .template-mark { display: grid; place-items: center; width: 3.3rem; height: 3.3rem; margin: 2.8rem 0 1.2rem; border-radius: 50%; background: var(--accent); color: #000; font-size: 1.6rem; font-weight: 700; }
@@ -66,10 +77,14 @@ a, .btn-link {
 .selection-banner { align-items: center; margin-top: 2.5rem; padding: 1rem 1.3rem; background: #fff; color: #000; }
 .selection-banner strong { display: block; margin-top: .25rem; }
 .selection-banner .eyebrow, .selection-banner > span { color: #444; font: .72rem 'DM Mono', monospace; }
+.finance-snapshot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: -2.5rem 0 4rem; padding: 1.25rem 1.4rem; border: 1px solid var(--line); background: linear-gradient(110deg, #121212, #080808); }
+.finance-snapshot h2 { margin: .35rem 0 .4rem; font-size: 1.35rem; }
+.finance-snapshot p:last-child { margin: 0; color: var(--muted); font-size: .85rem; }
 .jobs-strip { margin: 0 0 4.5rem; }
 .job-row { display: grid; grid-template-columns: minmax(220px, 1fr) 150px minmax(120px, 1fr); align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
 .job-row small { display: block; margin-top: .25rem; color: var(--muted); font: .68rem 'DM Mono', monospace; }
-.job-status { color: var(--deep-green); font: .68rem 'DM Mono', monospace; }
+.job-status { display: inline-flex; align-items: center; gap: .45rem; color: #ddd; font: .68rem 'DM Mono', monospace; }
+.job-status i { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
 .job-progress { height: 5px; overflow: hidden; background: #e3e9e1; }
 .job-progress i { display: block; height: 100%; background: var(--green); }
 .jobs-table { border-top: 2px solid #fff; background: #101010; }
@@ -108,6 +123,11 @@ a, .btn-link {
 .coinbase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem; }
 .json-output { max-height: 420px; overflow: auto; margin: 0; padding: 1rem; background: #050505; color: #ddd; font: .68rem/1.5 'DM Mono', monospace; white-space: pre-wrap; }
 .product-panel { margin-bottom: 2rem; }
+.balance-table { margin-bottom: 1rem; }
+.balance-head, .balance-row { display: grid; grid-template-columns: 1.2fr repeat(3, 1fr); gap: 1rem; align-items: center; padding: .9rem 0; }
+.balance-head { color: var(--muted); border-bottom: 1px solid var(--line); font: .65rem 'DM Mono', monospace; text-transform: uppercase; }
+.balance-row { border-bottom: 1px solid var(--line); color: #ddd; font: .78rem 'DM Mono', monospace; }
+.balance-row strong { color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: .95rem; }
 .file-grid { display: flex; flex-wrap: wrap; gap: .5rem; }
 .file-grid span { padding: .5rem .65rem; background: #202020; color: #ddd; font: .68rem 'DM Mono', monospace; }
 .login-shell { display: grid; place-items: center; min-height: 65vh; }
@@ -134,6 +154,11 @@ a, .btn-link {
 .nav-dot { width: 6px; height: 6px; margin: 0 .75rem 0 .25rem; border-radius: 50%; background: #666; }
 .nav-dot.active { background: #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, .15); }
 .navbar-brand span { color: #fff; }
+.app-toolbar { color: var(--muted); font: .7rem 'DM Mono', monospace; }
+.identity-chip { display: inline-flex; align-items: center; gap: .45rem; }
+.identity-chip i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.signout-button { border: 1px solid var(--line); padding: .45rem .65rem; background: transparent; color: #ddd; font: .68rem 'DM Mono', monospace; cursor: pointer; }
+.signout-button:hover { border-color: #fff; color: #fff; }
 
 @media (max-width: 900px) {
     .template-grid { grid-template-columns: 1fr; }
@@ -144,6 +169,8 @@ a, .btn-link {
     .content { padding: 2.5rem 1.1rem 3rem; }
     .dashboard-heading { display: block; }
     .health-pill { display: inline-block; margin-top: 1.5rem; }
+    .heading-signals { justify-items: start; }
+    .finance-snapshot { align-items: start; flex-direction: column; margin-top: -1rem; }
     .summary-grid { grid-template-columns: 1fr; margin-bottom: 3rem; }
     .section-heading { align-items: start; flex-direction: column; }
     .selection-banner { align-items: start; flex-direction: column; }
@@ -151,6 +178,8 @@ a, .btn-link {
     .project-layout { grid-template-columns: 1fr; }
     .settings-layout { grid-template-columns: 1fr; }
     .coinbase-grid { grid-template-columns: 1fr; }
+    .balance-head, .balance-row { grid-template-columns: 1fr 1fr; }
+    .balance-head span:nth-child(3), .balance-row > :nth-child(3) { display: none; }
     .project-metrics { grid-template-columns: 1fr; }
     .detail-grid { grid-template-columns: 1fr; }
     .detail-job-row { grid-template-columns: 1fr; }
@@ -197,4 +226,8 @@ h1:focus {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal, .template-card { animation: none; }
 }

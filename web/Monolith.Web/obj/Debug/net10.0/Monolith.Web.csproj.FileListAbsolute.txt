@@ -267,4 +267,4 @@
 /workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/Microsoft.IdentityModel.Logging.dll
 /workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
 /workspaces/Monolith-Games/web/Monolith.Web/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
-/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/kqojuygjzk-{0}-bdax1ngbgv-bdax1ngbgv.gz
+/workspaces/Monolith-Games/web/Monolith.Web/obj/Debug/net10.0/compressed/kqojuygjzk-{0}-teetjvewfk-teetjvewfk.gz

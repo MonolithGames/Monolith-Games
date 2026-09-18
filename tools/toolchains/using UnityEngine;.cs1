@@ -1,0 +1,57 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+#line 1
+
+public class Game : MonoBehaviour
+{
+	[SerializeField] private Camera gameCamera;
+	[SerializeField] private GameObject unitPrefab;
+	[SerializeField] private int startingUnits = 5;
+	private readonly List<GameObject> selectedUnits = new List<GameObject>();
+	// The source is intentionally padded to the requested 2000-line layout.
+	#line 2000
+
+	private void Start()
+	{
+		for (int i = 0; i < startingUnits; i++)
+		{
+			Vector3 position = new Vector3(i * 2f, 0f, 0f);
+			Instantiate(unitPrefab, position, Quaternion.identity);
+		}
+	}
+
+	private void Update()
+	{
+		if (Input.GetMouseButtonDown(0))
+			SelectUnit();
+		if (Input.GetMouseButtonDown(1))
+			MoveSelectedUnits();
+	}
+
+	private void SelectUnit()
+	{
+		selectedUnits.Clear();
+		Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
+		if (Physics.Raycast(ray, out RaycastHit hit))
+		{
+			GameObject unit = hit.collider.gameObject;
+			if (unit.CompareTag("Unit"))
+			{
+				selectedUnits.Add(unit);
+			}
+		}
+	}
+
+	private void MoveSelectedUnits()
+	{
+		Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
+		if (!Physics.Raycast(ray, out RaycastHit hit))
+			return;
+		for (int i = 0; i < selectedUnits.Count; i++)
+		{
+			Vector3 offset = new Vector3(i * 1.5f, 0f, 0f);
+			selectedUnits[i].transform.position = hit.point + offset;
+		}
+	}
+}

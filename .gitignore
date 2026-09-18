@@ -52,6 +52,21 @@ web/Monolith.Web/App_Data/
 web/**/bin/
 web/**/obj/
 
+# Local secrets and credentials
+.env
+.env.*
+!.env.example
+!.env.local.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+id_rsa
+id_ed25519
+.secrets/
+
 # Unity generated folders
 unity/Library/
 unity/Temp/

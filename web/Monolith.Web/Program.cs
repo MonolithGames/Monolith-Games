@@ -18,8 +18,6 @@ builder.Services.AddRazorComponents()
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
-    options.KnownNetworks.Clear();
-    options.KnownProxies.Clear();
 });
 var dataPath = builder.Configuration["MONOLITH_DATA_PATH"] ?? Path.Combine(builder.Environment.ContentRootPath, "App_Data");
 Directory.CreateDirectory(dataPath);
@@ -46,6 +44,7 @@ builder.Services.AddSingleton<TradingPolicy>();
 builder.Services.AddSingleton<PaperTradingService>();
 builder.Services.AddHttpClient("coinbase", client => client.Timeout = TimeSpan.FromSeconds(15));
 builder.Services.AddSingleton<CoinbaseReadOnlyClient>();
+builder.Services.AddSingleton<CoinbaseFinancialDataService>();
 builder.Services.AddHostedService<PipelineWorker>();
 var databasePath = Path.Combine(dataPath, "monolith.db");
 builder.Services.AddDbContextFactory<MonolithDbContext>(options =>
