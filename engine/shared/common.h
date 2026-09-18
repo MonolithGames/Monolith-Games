@@ -1,6 +1,0 @@
-#ifndef MONOLITH_SHARED_COMMON_H
-#define MONOLITH_SHARED_COMMON_H
-
-#define MONOLITH_ENGINE_NAME "Monolith"
-
-#endif

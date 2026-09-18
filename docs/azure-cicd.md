@@ -12,7 +12,7 @@ GitHub Actions
     -> protected production deployment
     -> Azure web runtime
     -> optional Apache HTTPD edge
-    -> Monolith container :8080
+    -> Monolith container :65000
 ```
 
 ## GitHub configuration
@@ -40,5 +40,5 @@ trading control plane is independently approved.
 ## Apache
 
 Use `deploy/apache/monolith.conf` when Apache is the public edge. It forwards
-HTTP and Blazor WebSocket traffic to the private container port 8080 and
+HTTP and Blazor WebSocket traffic to the private container port 65000 and
 terminates TLS at Apache. Expose only 80/443 publicly.

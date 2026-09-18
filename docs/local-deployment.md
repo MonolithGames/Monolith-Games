@@ -48,3 +48,21 @@ local state:
 ```bash
 docker compose -f docker-compose.local.yml down -v
 ```
+
+## Simulation runtime
+
+Run the isolated paper-trading environment on port `5188`:
+
+```bash
+docker compose -f docker-compose.simulation.yml up --build -d
+```
+
+Open `http://127.0.0.1:5188`. This runtime uses a separate Docker volume,
+keeps live Coinbase trading disabled, and accepts paper orders from the `$2`
+minimum up to its configured simulation ceiling.
+
+Stop it with:
+
+```bash
+docker compose -f docker-compose.simulation.yml down
+```

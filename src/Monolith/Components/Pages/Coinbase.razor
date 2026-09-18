@@ -1,0 +1,66 @@
+@page "/coinbase"
+@attribute [Authorize]
+@using System.Text.Json
+@using Monolith.Models
+@using Monolith.Services
+@inject CoinbaseReadOnlyClient CoinbaseClient
+@inject CoinbaseSettingsStore Settings
+@inject CoinbaseFinancialDataService FinancialData
+
+<PageTitle>Coinbase / Monolith</PageTitle>
+
+<section class="dashboard-heading compact-heading">
+    <div><p class="eyebrow">MARKETS / COINBASE</p><h1>Production account view.</h1><p class="lede">Read-only access to Coinbase products, balances, and portfolios. Order booking is intentionally not available yet.</p></div>
+    <button class="launch-button coinbase-refresh" @onclick="Refresh" disabled="@Loading">@(Loading ? "Refreshing..." : "Refresh data") <span aria-hidden="true">-></span></button>
+</section>
+
+@if (!Settings.GetStatus().IsConfigured)
+{
+    <section class="selection-banner"><div><span class="eyebrow">COINBASE NOT CONNECTED</span><strong>Add production credentials in Settings.</strong></div><a class="api-link" href="/settings">Open settings <span aria-hidden="true">-></span></a></section>
+}
+else
+{
+    <section class="summary-grid"><div class="summary-card"><span class="summary-label">Portfolio value</span><strong>@(Snapshot?.PortfolioTotal is decimal total ? total.ToString("C2") : "Unavailable")</strong><small>Provider-reported total</small></div><div class="summary-card"><span class="summary-label">Tracked assets</span><strong>@(Snapshot?.Balances.Count ?? 0)</strong><small>Available Coinbase balances</small></div><div class="summary-card"><span class="summary-label">Last refresh</span><strong>@(Snapshot is null ? "Never" : Snapshot.RefreshedAtUtc.ToLocalTime().ToString("h:mm tt"))</strong><small>@(Snapshot?.IsStale == true ? "Refresh failed" : "Signed server request")</small></div></section>
+    @if (!string.IsNullOrEmpty(Error)) { <div class="login-error">@Error</div> }
+    @if (Snapshot?.Balances.Count > 0)
+    {
+        <section class="balance-table operation-panel"><div class="section-heading"><div><p class="eyebrow">ASSET BALANCES</p><h2>What you hold</h2></div></div><div class="balance-head"><span>Asset</span><span>Available</span><span>Held</span><span>Total</span></div>@foreach (var balance in Snapshot.Balances) { <div class="balance-row"><strong>@balance.Asset</strong><span>@balance.Available.ToString("0.########") @balance.Currency</span><span>@balance.Held.ToString("0.########") @balance.Currency</span><span>@((balance.Available + balance.Held).ToString("0.########")) @balance.Currency</span></div> }</section>
+    }
+    else if (Snapshot is not null && string.IsNullOrEmpty(Error)) { <section class="selection-banner"><div><span class="eyebrow">NO BALANCES RETURNED</span><strong>Coinbase returned no normalized account balances.</strong></div></section> }
+    <section class="coinbase-grid">
+        <article class="operation-panel"><p class="eyebrow">ACCOUNTS</p><h2>Provider response</h2><pre class="json-output">@(Accounts?.GetRawText() ?? "Press refresh to load account balances.")</pre></article>
+        <article class="operation-panel"><p class="eyebrow">PORTFOLIOS</p><h2>Portfolio state</h2><pre class="json-output">@(Portfolios?.GetRawText() ?? "Press refresh to load portfolios.")</pre></article>
+    </section>
+    <article class="operation-panel product-panel"><p class="eyebrow">PRODUCT CATALOG</p><h2>Available Coinbase products</h2><pre class="json-output">@(Products?.GetRawText() ?? "Press refresh to load products.")</pre></article>
+}
+
+@code {
+    private JsonElement? Products;
+    private JsonElement? Accounts;
+    private JsonElement? Portfolios;
+    private FinancialSnapshot? Snapshot;
+    private bool Loading;
+    private string? Error;
+
+    private async Task Refresh()
+    {
+        Loading = true;
+        Error = null;
+        try
+        {
+            Products = await CoinbaseClient.GetProductsAsync(CancellationToken.None);
+            Accounts = await CoinbaseClient.GetAccountsAsync(CancellationToken.None);
+            Portfolios = await CoinbaseClient.GetPortfoliosAsync(CancellationToken.None);
+            Snapshot = await FinancialData.LoadAsync(CancellationToken.None);
+            Error = Snapshot.Error;
+        }
+        catch (Exception exception)
+        {
+            Error = exception.Message;
+        }
+        finally
+        {
+            Loading = false;
+         }
+    }
+}

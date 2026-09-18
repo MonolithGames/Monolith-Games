@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "65000:65000"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       MONOLITH_DATA_PATH: /data

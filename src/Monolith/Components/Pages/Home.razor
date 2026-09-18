@@ -1,0 +1,108 @@
+﻿@page "/"
+@attribute [Authorize]
+@using Monolith.Models
+@using Monolith.Services
+@inject TemplateCatalog Catalog
+@inject WorkspaceStore Workspace
+@inject CoinbaseSettingsStore CoinbaseSettings
+
+<PageTitle>Monolith / Production desk</PageTitle>
+
+<section class="dashboard-heading reveal reveal-1">
+	<div>
+		<p class="eyebrow">MONOLITH / PRODUCTION DESK</p>
+		<h1>Choose what ships next.</h1>
+		<p class="lede">A focused workspace for shaping game concepts into build-ready production jobs.</p>
+	</div>
+	<div class="heading-signals"><div class="health-pill"><span></span> Pipeline idle</div><div class="updated-signal">Updated @LastUpdated.ToLocalTime().ToString("h:mm tt")</div></div>
+</section>
+
+<section class="summary-grid reveal reveal-2" aria-label="Production summary">
+	<div class="summary-card"><span class="summary-label">Templates</span><strong>@Templates.Count.ToString("00")</strong><small>Available to start</small><span class="summary-rule"></span></div>
+	<div class="summary-card"><span class="summary-label">Active jobs</span><strong>@Jobs.Count(job => job.Status is "Queued" or "Running pipeline").ToString("00")</strong><small>Local jobs in progress</small><span class="summary-rule"></span></div>
+	<div class="summary-card"><span class="summary-label">Release lane</span><strong>Review</strong><small>Human approval required</small><span class="summary-rule"></span></div>
+</section>
+
+<section class="finance-snapshot reveal reveal-2"><div><p class="eyebrow">MARKETS / COINBASE</p><h2>Financial workspace</h2><p>@(CoinbaseSettings.GetStatus().IsConfigured ? "Account connected; open the market view for balances and portfolio data." : "Connect Coinbase credentials to surface balances and portfolio state.")</p></div><a class="api-link" href="@(CoinbaseSettings.GetStatus().IsConfigured ? "/coinbase" : "/settings")">@(CoinbaseSettings.GetStatus().IsConfigured ? "Open market view" : "Connect account") <span aria-hidden="true">-></span></a></section>
+
+@if (Jobs.Count > 0)
+{
+	<section class="jobs-strip reveal reveal-3">
+		<div class="section-heading"><div><p class="eyebrow">RECENT JOBS</p><h2>Production queue</h2></div><a class="api-link" href="/jobs">Open history <span aria-hidden="true">-></span></a></div>
+		@foreach (var job in Jobs.Take(3))
+		{
+			<div class="job-row"><div><strong>@job.TemplateName</strong><small>@job.CreatedAtUtc.ToLocalTime().ToString("MMM d, h:mm tt")</small></div><span class="job-status"><i></i>@job.Status</span><div class="job-progress"><i style="width: @job.Progress%"></i></div></div>
+		}
+	</section>
+}
+
+<section class="template-section reveal reveal-3">
+	<div class="section-heading">
+		<div>
+			<p class="eyebrow">TEMPLATE CATALOG</p>
+			<h2>Production starters</h2>
+		</div>
+		<a class="api-link" href="/api/templates" target="_blank">View API data <span aria-hidden="true">-></span></a>
+	</div>
+
+	<div class="template-grid">
+		@for (var index = 0; index < Templates.Count; index++)
+		{
+			var template = Templates[index];
+			<article class="template-card" style="--accent: @template.Accent; --delay: @(index * 80)ms">
+				<div class="template-card-top">
+					<span class="template-index">0@(index + 1)</span>
+					<span class="template-status">@template.Status</span>
+				</div>
+				<div class="template-mark">@template.Name.Substring(0, 1)</div>
+				<p class="template-category">@template.Category</p>
+				<h3>@template.Name</h3>
+				<p class="template-description">@template.Description</p>
+				<div class="pipeline-preview">
+					@foreach (var stage in template.Pipeline)
+					{
+						<span>@stage</span>
+					}
+				</div>
+				<button class="launch-button" @onclick="() => CreateJob(template)">
+					@(SelectedTemplate?.Slug == template.Slug ? "Job created" : "Create production job")
+					<span aria-hidden="true">-></span>
+				</button>
+			</article>
+		}
+	</div>
+</section>
+
+@if (SelectedTemplate is not null)
+{
+	<section class="selection-banner" aria-live="polite">
+		<div><span class="eyebrow">SELECTED TEMPLATE</span><strong>@SelectedTemplate.Name</strong></div>
+		<span>Ready to create a production job</span>
+	</section>
+}
+
+@code {
+	private IReadOnlyList<GameTemplate> Templates = [];
+	private GameTemplate? SelectedTemplate;
+	private IReadOnlyList<ProductionJob> Jobs = [];
+	private DateTime LastUpdated = DateTime.Now;
+
+	protected override void OnInitialized()
+	{
+		Templates = Catalog.GetAll();
+		Jobs = Workspace.GetJobs();
+		LastUpdated = DateTime.Now;
+	}
+
+	private void SelectTemplate(GameTemplate template)
+	{
+		SelectedTemplate = template;
+	}
+
+	private void CreateJob(GameTemplate template)
+	{
+		SelectedTemplate = template;
+		Workspace.CreateJob(template.Slug);
+		Jobs = Workspace.GetJobs();
+	}
+}

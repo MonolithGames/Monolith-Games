@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Monolith.Sentinel.Tests/1.0.0": {
+        "dependencies": {
+          "Monolith.Sentinel": "1.0.0",
+          "Monolith.Shared": "1.0.0"
+        },
+        "runtime": {
+          "Monolith.Sentinel.Tests.dll": {}
+        }
+      },
+      "Monolith.Sentinel/1.0.0": {
+        "dependencies": {
+          "Monolith.Shared": "1.0.0"
+        },
+        "runtime": {
+          "Monolith.Sentinel.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Monolith.Shared/1.0.0": {
+        "runtime": {
+          "Monolith.Shared.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Monolith.Sentinel.Tests/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Monolith.Sentinel/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Monolith.Shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

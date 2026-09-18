@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5187:8080"
+      - "5187:65000"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       MONOLITH_DATA_PATH: /data
@@ -14,6 +14,7 @@ services:
       TRADING_KILL_SWITCH: "true"
       PAPER_TRADING_ENABLED: "true"
       PAPER_STARTING_CASH: "100000"
+      COINBASE_MIN_ORDER_NOTIONAL: "2"
       COINBASE_MAX_ORDER_NOTIONAL: "1000"
     volumes:
       - monolith-local-data:/data

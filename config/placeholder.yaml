@@ -1,2 +1,5 @@
-project: Monolith
+solution: Monolith
+project: Monolith.Sentinel
+service_name: Monolith Sentinel
+port: 65535
 status: scaffold

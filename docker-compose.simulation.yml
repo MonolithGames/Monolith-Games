@@ -1,0 +1,24 @@
+services:
+  monolith-simulation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5188:65000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      MONOLITH_DATA_PATH: /data
+      AUORA_PASSWORD: ${AUORA_PASSWORD:-0}
+      COINBASE_LIVE_TRADING_ENABLED: "false"
+      COINBASE_WITHDRAWALS_ENABLED: "false"
+      TRADING_KILL_SWITCH: "false"
+      PAPER_TRADING_ENABLED: "true"
+      PAPER_STARTING_CASH: "100000"
+      COINBASE_MIN_ORDER_NOTIONAL: "2"
+      COINBASE_MAX_ORDER_NOTIONAL: "1000000000000"
+    volumes:
+      - monolith-simulation-data:/data
+    restart: unless-stopped
+
+volumes:
+  monolith-simulation-data:
