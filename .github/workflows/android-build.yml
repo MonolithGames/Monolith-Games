@@ -1,13 +1,12 @@
-name: Android APK Build
+name: Android Build & Play Store Publish
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "release" ] # Triggers when pushing to the release branch
+  workflow_dispatch:      # Allows manual trigger from GitHub UI
 
 jobs:
-  build-android:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,17 +27,26 @@ jobs:
     - name: Setup Gradle Cache
       uses: gradle/actions/setup-gradle@v3
 
-    - name: Build Android APKs
-      run: gradle assembleDebug
+    - name: Build Release App Bundles (AAB)
+      run: gradle bundleRelease
 
-    - name: Upload APK Artifacts
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: android-apk-artifacts
+        name: release-aab-artifacts
         path: |
-          src/Alphabet/build/outputs/apk/debug/*.apk
-          src/NeonBlade/build/outputs/apk/debug/*.apk
-          src/QuantumGrid/build/outputs/apk/debug/*.apk
-          src/PixelQuest/build/outputs/apk/debug/*.apk
-          src/EchoRider/build/outputs/apk/debug/*.apk
+          src/Alphabet/build/outputs/bundle/release/*.aab
+          src/NeonBlade/build/outputs/bundle/release/*.aab
+          src/QuantumGrid/build/outputs/bundle/release/*.aab
+          src/PixelQuest/build/outputs/bundle/release/*.aab
+          src/EchoRider/build/outputs/bundle/release/*.aab
         if-no-files-found: warn
+
+    # Uncomment below once Google Play service account secret is added to GitHub
+    # - name: Publish to Google Play (Internal Testing Track)
+    #   uses: r0adkll/upload-google-play@v6
+    #   with:
+    #     service_account_json_raw_key: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+    #     packageName: 'com.monolith.alphabet'
+    #     releaseFiles: src/Alphabet/build/outputs/bundle/release/*.aab
+    #     track: internal
