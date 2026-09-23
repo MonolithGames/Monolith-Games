@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.monolith.alphabet"
+    namespace = "com.monolith.calculator"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.monolith.alphabet"
+        applicationId = "com.monolith.calculator"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

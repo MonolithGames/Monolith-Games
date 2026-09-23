@@ -14,8 +14,8 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Monolith-Games"
-include(":Alphabet")
-project(":Alphabet").projectDir = file("src/Alphabet")
+include(":Calculator")
+project(":Calculator").projectDir = file("src/Calculator")
 include(":NeonBlade")
 project(":NeonBlade").projectDir = file("src/NeonBlade")
 include(":QuantumGrid")

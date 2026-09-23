@@ -35,7 +35,7 @@ jobs:
       with:
         name: release-aab-artifacts
         path: |
-          src/Alphabet/build/outputs/bundle/release/*.aab
+          src/Calculator/build/outputs/bundle/release/*.aab
           src/NeonBlade/build/outputs/bundle/release/*.aab
           src/QuantumGrid/build/outputs/bundle/release/*.aab
           src/PixelQuest/build/outputs/bundle/release/*.aab
@@ -47,6 +47,6 @@ jobs:
     #   uses: r0adkll/upload-google-play@v6
     #   with:
     #     service_account_json_raw_key: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-    #     packageName: 'com.monolith.alphabet'
-    #     releaseFiles: src/Alphabet/build/outputs/bundle/release/*.aab
+    #     packageName: 'com.monolith.calculator'
+    #     releaseFiles: src/Calculator/build/outputs/bundle/release/*.aab
     #     track: internal
