@@ -1065,24 +1065,32 @@
     ]
   },
   "packageFolders": {
-    "/home/codespace/.nuget/packages/": {}
+    "C:\\Users\\auora\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/workspaces/Monolith-Games/tests/Monolith.Tests/Monolith.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\tests\\Monolith.Tests\\Monolith.Tests.csproj",
       "projectName": "Monolith.Tests",
-      "projectPath": "/workspaces/Monolith-Games/tests/Monolith.Tests/Monolith.Tests.csproj",
-      "packagesPath": "/home/codespace/.nuget/packages/",
-      "outputPath": "/workspaces/Monolith-Games/tests/Monolith.Tests/obj/",
+      "projectPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\tests\\Monolith.Tests\\Monolith.Tests.csproj",
+      "packagesPath": "C:\\Users\\auora\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\tests\\Monolith.Tests\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/home/codespace/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\auora\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1090,11 +1098,11 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/workspaces/Monolith-Games/src/Monolith.Shared/Monolith.Shared.csproj": {
-              "projectPath": "/workspaces/Monolith-Games/src/Monolith.Shared/Monolith.Shared.csproj"
+            "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith.Shared\\Monolith.Shared.csproj": {
+              "projectPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith.Shared\\Monolith.Shared.csproj"
             },
-            "/workspaces/Monolith-Games/src/Monolith/Monolith.csproj": {
-              "projectPath": "/workspaces/Monolith-Games/src/Monolith/Monolith.csproj"
+            "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith\\Monolith.csproj": {
+              "projectPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith\\Monolith.csproj"
             }
           }
         }
@@ -1131,7 +1139,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.400/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

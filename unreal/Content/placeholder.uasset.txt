@@ -1,1 +1,0 @@
-Binary Unreal asset placeholder. Add a real .uasset through the Unreal Editor.

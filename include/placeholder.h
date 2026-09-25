@@ -1,4 +1,0 @@
-#ifndef MONOLITH_PLACEHOLDER_H
-#define MONOLITH_PLACEHOLDER_H
-
-#endif

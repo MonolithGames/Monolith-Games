@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/workspaces/Monolith-Games/src/Monolith/Monolith.csproj": {}
+    "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith\\Monolith.csproj": {}
   },
   "projects": {
-    "/workspaces/Monolith-Games/src/Monolith.Shared/Monolith.Shared.csproj": {
+    "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith.Shared\\Monolith.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/Monolith-Games/src/Monolith.Shared/Monolith.Shared.csproj",
+        "projectUniqueName": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith.Shared\\Monolith.Shared.csproj",
         "projectName": "Monolith.Shared",
-        "projectPath": "/workspaces/Monolith-Games/src/Monolith.Shared/Monolith.Shared.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/Monolith-Games/src/Monolith.Shared/obj/",
+        "projectPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith.Shared\\Monolith.Shared.csproj",
+        "packagesPath": "C:\\Users\\auora\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith.Shared\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\auora\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -59,11 +66,15 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[9.0.19, 9.0.19]"
+              "version": "[9.0.20, 9.0.20]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[9.0.19, 9.0.19]"
+              "version": "[9.0.20, 9.0.20]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
             }
           ],
           "frameworkReferences": {
@@ -71,26 +82,33 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/workspaces/Monolith-Games/src/Monolith/Monolith.csproj": {
+    "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith\\Monolith.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/Monolith-Games/src/Monolith/Monolith.csproj",
+        "projectUniqueName": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith\\Monolith.csproj",
         "projectName": "Monolith",
-        "projectPath": "/workspaces/Monolith-Games/src/Monolith/Monolith.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/Monolith-Games/src/Monolith/obj/",
+        "projectPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith\\Monolith.csproj",
+        "packagesPath": "C:\\Users\\auora\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\auora\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -98,8 +116,8 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/workspaces/Monolith-Games/src/Monolith.Shared/Monolith.Shared.csproj": {
-                "projectPath": "/workspaces/Monolith-Games/src/Monolith.Shared/Monolith.Shared.csproj"
+              "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith.Shared\\Monolith.Shared.csproj": {
+                "projectPath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\src\\Monolith.Shared\\Monolith.Shared.csproj"
               }
             }
           }
@@ -124,7 +142,7 @@
             "Microsoft.AspNetCore.App.Internal.Assets": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.11, )",
+              "version": "[10.0.12, )",
               "autoReferenced": true
             },
             "Microsoft.EntityFrameworkCore.Design": {
@@ -161,7 +179,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.400/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

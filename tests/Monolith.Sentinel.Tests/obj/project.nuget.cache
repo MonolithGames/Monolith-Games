@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "x4cPm8sUSsU=",
+  "dgSpecHash": "MPQyGFhYAOs=",
   "success": true,
-  "projectFilePath": "/workspaces/Monolith-Games/tests/Monolith.Sentinel.Tests/Monolith.Sentinel.Tests.csproj",
+  "projectFilePath": "C:\\Users\\auora\\StudioProjects\\Monolith-Games\\tests\\Monolith.Sentinel.Tests\\Monolith.Sentinel.Tests.csproj",
   "expectedPackageFiles": [
-    "/home/codespace/.nuget/packages/microsoft.netcore.app.ref/9.0.19/microsoft.netcore.app.ref.9.0.19.nupkg.sha512",
-    "/home/codespace/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.19/microsoft.aspnetcore.app.ref.9.0.19.nupkg.sha512"
+    "C:\\Users\\auora\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.20\\microsoft.netcore.app.ref.9.0.20.nupkg.sha512",
+    "C:\\Users\\auora\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.20\\microsoft.windowsdesktop.app.ref.9.0.20.nupkg.sha512",
+    "C:\\Users\\auora\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.20\\microsoft.aspnetcore.app.ref.9.0.20.nupkg.sha512",
+    "C:\\Users\\auora\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\9.0.20\\microsoft.netcore.app.host.win-x64.9.0.20.nupkg.sha512"
   ],
   "logs": []
 }

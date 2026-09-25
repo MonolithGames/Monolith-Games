@@ -68,6 +68,16 @@ builder.Services.AddSingleton<CoinbaseTradingClient>();
 builder.Services.AddHttpClient("coinbase", client => client.Timeout = TimeSpan.FromSeconds(15));
 builder.Services.AddSingleton<CoinbaseReadOnlyClient>();
 builder.Services.AddSingleton<CoinbaseFinancialDataService>();
+builder.Services.AddSingleton<KrakenSettingsStore>();
+builder.Services.AddHttpClient<KrakenReadOnlyClient>(client => client.Timeout = TimeSpan.FromSeconds(15));
+builder.Services.AddSingleton<GeminiSettingsStore>();
+builder.Services.AddHttpClient<GeminiReadOnlyClient>(client => client.Timeout = TimeSpan.FromSeconds(15));
+builder.Services.AddSingleton<CryptoComSettingsStore>();
+builder.Services.AddHttpClient<CryptoComReadOnlyClient>(client => client.Timeout = TimeSpan.FromSeconds(15));
+builder.Services.AddSingleton<AiTradingService>();
+builder.Services.AddSingleton<AiAgentSynthesizerService>();
+builder.Services.AddSingleton<PostPublishingTelemetry>();
+builder.Services.AddSingleton<BalanceSyncService>();
 builder.Services.AddHostedService<PipelineWorker>();
 var databasePath = Path.Combine(dataPath, "monolith.db");
 builder.Services.AddDbContextFactory<MonolithDbContext>(options =>

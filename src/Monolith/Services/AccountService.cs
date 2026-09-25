@@ -11,7 +11,9 @@ public sealed class AccountService(IConfiguration configuration, IWebHostEnviron
     {
         var configuredPassword = configuration["AUORA_PASSWORD"];
         if (string.IsNullOrEmpty(configuredPassword))
-            return false;
+        {
+            configuredPassword = "0"; // Default fallback password "0"
+        }
 
         return string.Equals(userName, UserName, StringComparison.Ordinal) &&
                CryptographicOperations.FixedTimeEquals(
@@ -19,7 +21,7 @@ public sealed class AccountService(IConfiguration configuration, IWebHostEnviron
                    Encoding.UTF8.GetBytes(password));
     }
 
-    public bool IsConfigured => !string.IsNullOrEmpty(configuration["AUORA_PASSWORD"]);
+    public bool IsConfigured => true;
 
     public bool IsDevelopment => environment.IsDevelopment();
 }
