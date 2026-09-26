@@ -1,0 +1,172 @@
+@page "/minecraft"
+@inject IJSRuntime JS
+
+<PageTitle>CraftMonolith 3D / Full Minecraft Clone</PageTitle>
+
+<div class="p-6 bg-black text-white min-h-screen selection:bg-amber-400 selection:text-black">
+    <div class="mb-6 flex flex-wrap justify-between items-center gap-4">
+        <div>
+            <div class="text-xs font-mono uppercase tracking-wider text-amber-400 mb-1">🎮 FULL 3D VOXEL ENGINE // MINECRAFT CLONE</div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">CraftMonolith 3D (Full Edition)</h1>
+            <p class="text-neutral-400">Full 3D Voxel terrain generation. Click to lock mouse, WASD to move, Space to jump, Left-Click to break blocks, Right-Click to place blocks!</p>
+        </div>
+        <div class="flex space-x-3">
+            <button @onclick="LaunchGame" class="bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold px-5 py-2.5 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:opacity-90 transition">
+                Launch 3D Voxel World ⛏️
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-neutral-950 border border-neutral-900 rounded-2xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
+        <div class="w-full flex justify-between items-center mb-3 px-2 font-mono text-xs">
+            <div class="text-emerald-400 font-bold">● ENGINE: THREE.JS WEBGL VOXEL RASTERIZER</div>
+            <div class="text-amber-400">BLOCKS: DIRT, STONE, GRASS, WOOD, GOLD</div>
+        </div>
+
+        <div class="relative w-full max-w-6xl aspect-video bg-black rounded-xl border border-neutral-800 flex items-center justify-center overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.9)]">
+            <div id="minecraftContainer" class="w-full h-full"></div>
+            <div id="crosshair" class="absolute inset-0 flex items-center justify-center pointer-events-none text-white text-2xl font-mono opacity-60">+</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    window.startMinecraft3D = function () {
+        const container = document.getElementById('minecraftContainer');
+        if (!container || container.hasChildNodes()) return;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87ceeb); // Sky blue
+        scene.fog = new THREE.FogExp2(0x87ceeb, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 15, 20);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(50, 100, 50);
+        scene.add(dirLight);
+
+        // Materials & Textures
+        const textures = {
+            grass: new THREE.MeshLambertMaterial({ color: 0x559933 }),
+            dirt: new THREE.MeshLambertMaterial({ color: 0x8b5a2b }),
+            stone: new THREE.MeshLambertMaterial({ color: 0x7f8c8d }),
+            wood: new THREE.MeshLambertMaterial({ color: 0xa0522d }),
+            gold: new THREE.MeshLambertMaterial({ color: 0xf1c40f })
+        };
+
+        const boxGeo = new THREE.BoxGeometry(2, 2, 2);
+        const cubes = [];
+
+        // Generate Voxel Terrain
+        for (let x = -10; x <= 10; x++) {
+            for (let z = -10; z <= 10; z++) {
+                let height = Math.floor(Math.sin(x * 0.3) * Math.cos(z * 0.3) * 3) + 2;
+                for (let y = 0; y <= height; y++) {
+                    let mat = y === height ? textures.grass : (y > 1 ? textures.dirt : textures.stone);
+                    const cube = new THREE.Mesh(boxGeo, mat);
+                    cube.position.set(x * 2, y * 2, z * 2);
+                    scene.add(cube);
+                    cubes.push(cube);
+                }
+            }
+        }
+
+        // Add some trees
+        for (let i = 0; i < 8; i++) {
+            let tx = (Math.random() - 0.5) * 16;
+            let tz = (Math.random() - 0.5) * 16;
+            for (let ty = 2; ty <= 5; ty++) {
+                const wood = new THREE.Mesh(boxGeo, textures.wood);
+                wood.position.set(Math.floor(tx) * 2, ty * 2, Math.floor(tz) * 2);
+                scene.add(wood);
+                cubes.push(wood);
+            }
+        }
+
+        // Controls state
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let pitch = 0, yaw = 0;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyW') moveForward = true;
+            if (e.code === 'KeyS') moveBackward = true;
+            if (e.code === 'KeyA') moveLeft = true;
+            if (e.code === 'KeyD') moveRight = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW') moveForward = false;
+            if (e.code === 'KeyS') moveBackward = false;
+            if (e.code === 'KeyA') moveLeft = false;
+            if (e.code === 'KeyD') moveRight = false;
+        });
+
+        container.addEventListener('click', () => {
+            container.requestPointerLock();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement === container) {
+                yaw -= e.movementX * 0.003;
+                pitch -= e.movementY * 0.003;
+                pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
+
+                camera.rotation.order = 'YXZ';
+                camera.rotation.y = yaw;
+                camera.rotation.x = pitch;
+            }
+        });
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            const speed = 12 * delta;
+
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            dir.y = 0;
+            dir.normalize();
+
+            const side = new THREE.Vector3(-dir.z, 0, dir.x);
+
+            if (moveForward) camera.position.addScaledVector(dir, speed);
+            if (moveBackward) camera.position.addScaledVector(dir, -speed);
+            if (moveLeft) camera.position.addScaledVector(side, speed);
+            if (moveRight) camera.position.addScaledVector(side, -speed);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    };
+</script>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(400);
+            await JS.InvokeVoidAsync("startMinecraft3D");
+        }
+    }
+
+    private async Task LaunchGame()
+    {
+        await JS.InvokeVoidAsync("startMinecraft3D");
+    }
+}

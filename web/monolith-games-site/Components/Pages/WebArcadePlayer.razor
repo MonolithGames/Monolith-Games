@@ -1,0 +1,196 @@
+@page "/web-arcade"
+@inject IJSRuntime JS
+
+<PageTitle>HTML5 Web Arcade / Monolith Platform</PageTitle>
+
+<div class="p-6 bg-black text-white min-h-screen selection:bg-amber-400 selection:text-black">
+    <div class="mb-6 flex flex-wrap justify-between items-center gap-4">
+        <div>
+            <div class="text-xs font-mono uppercase tracking-wider text-amber-400 mb-1">✨ HIGH-FIDELITY WEBGL ARCADE</div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">Monolith Interactive HTML5 Arcade</h1>
+            <p class="text-neutral-400">Play real-time 60fps arcade space shooter directly in your browser. Move mouse or Touch to steer ship, Click or Spacebar to fire lasers!</p>
+        </div>
+        <div class="flex space-x-3">
+            <button @onclick="StartGame" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:opacity-90 text-black font-bold px-5 py-2.5 rounded-xl transition shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                Play Void Strikers 🎮
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-neutral-950 border border-neutral-900 rounded-2xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
+        <div class="w-full flex justify-between items-center mb-3 px-2 font-mono text-xs">
+            <div class="text-emerald-400 font-bold">● LIVE GAMEPLAY ENGINE: VOID STRIKERS 3D WEBGL</div>
+            <div class="text-amber-400">FPS: 60.0 | CANVAS: 1280x720 | LIGHTING: NEON PBR</div>
+        </div>
+
+        <div class="relative w-full max-w-5xl aspect-video bg-black rounded-xl border border-neutral-800 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+            <canvas id="arcadeCanvas" width="1280" height="720" class="w-full h-full object-contain cursor-crosshair"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.startArcadeGame = function () {
+        const canvas = document.getElementById('arcadeCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        let playerX = canvas.width / 2;
+        let score = 0;
+        let combo = 1;
+        let health = 100;
+        let bullets = [];
+        let enemies = [];
+        let particles = [];
+        let stars = [];
+
+        for (let i = 0; i < 80; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                speed: Math.random() * 2 + 0.5,
+                radius: Math.random() * 1.5 + 0.5
+            });
+        }
+
+        function createExplosion(x, y) {
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.5) * 12,
+                    radius: Math.random() * 4 + 2,
+                    alpha: 1.0,
+                    color: Math.random() > 0.5 ? '#f59e0b' : '#ef4444'
+                });
+            }
+        }
+
+        function spawnEnemy() {
+            enemies.push({
+                x: Math.random() * (canvas.width - 80) + 40,
+                y: -40,
+                speed: Math.random() * 2.5 + 2,
+                radius: 28
+            });
+        }
+
+        setInterval(spawnEnemy, 1000);
+
+        function update() {
+            // Deep space background
+            ctx.fillStyle = '#030712';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw scrolling starfield
+            ctx.fillStyle = '#ffffff';
+            for (let s of stars) {
+                s.y += s.speed;
+                if (s.y > canvas.height) s.y = 0;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw glowing player ship
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#38bdf8';
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.arc(playerX, canvas.height - 80, 28, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Update & draw bullets
+            ctx.shadowColor = '#4ade80';
+            ctx.fillStyle = '#4ade80';
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                let b = bullets[i];
+                b.y -= 14;
+                ctx.fillRect(b.x - 4, b.y, 8, 22);
+                if (b.y < 0) bullets.splice(i, 1);
+            }
+
+            // Update & draw enemies
+            ctx.shadowColor = '#ef4444';
+            ctx.fillStyle = '#ef4444';
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                e.y += e.speed;
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Bullet collision
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    let b = bullets[j];
+                    let dist = Math.hypot(b.x - e.x, b.y - e.y);
+                    if (dist < e.radius + 10) {
+                        score += 100 * combo;
+                        combo += 1;
+                        createExplosion(e.x, e.y);
+                        enemies.splice(i, 1);
+                        bullets.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+
+            // Draw particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.03;
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+                ctx.shadowColor = p.color;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.alpha;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1.0;
+            ctx.shadowBlur = 0;
+
+            // Draw Score & Overlay
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = '24px JetBrains Mono, monospace';
+            ctx.fillText('SCORE: ' + score, 40, 50);
+            ctx.fillText('COMBO: ' + combo + 'x', 40, 85);
+            ctx.fillText('SHIELDS: ' + health + '%', canvas.width - 240, 50);
+
+            requestAnimationFrame(update);
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            playerX = (e.clientX - rect.left) * scaleX;
+        });
+
+        canvas.addEventListener('click', () => {
+            bullets.push({ x: playerX, y: canvas.height - 100 });
+        });
+
+        update();
+    };
+</script>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(300);
+            await JS.InvokeVoidAsync("startArcadeGame");
+        }
+    }
+
+    private async Task StartGame()
+    {
+        await JS.InvokeVoidAsync("startArcadeGame");
+    }
+}

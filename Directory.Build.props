@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <TieredCompilation>true</TieredCompilation>
+    <TieredPGO>true</TieredPGO>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+</Project>
