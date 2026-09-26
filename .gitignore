@@ -45,21 +45,18 @@
 *.idb
 *.pdb
 
+# Build outputs & caches
+build/
+**/build/
+**/bin/
+**/obj/
+.gradle/
+.idea/
+**/ .idea/
+
 # Monolith runtime data & databases
 **/App_Data/
 App_Data/
-
-# IDE Workspace & User Settings
-.idea/workspace.xml
-.idea/caches/
-.idea/deviceManager.xml
-.idea/shelf/
-
-# .NET build outputs
-**/bin/
-**/obj/
-web/**/bin/
-web/**/obj/
 
 # Local secrets and credentials
 .env
