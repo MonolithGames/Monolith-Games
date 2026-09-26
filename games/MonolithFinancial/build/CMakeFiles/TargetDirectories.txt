@@ -1,4 +1,0 @@
-C:/Users/auora/StudioProjects/Monolith-Games/src/MonolithFinancial/build/CMakeFiles/icon_generator.dir
-C:/Users/auora/StudioProjects/Monolith-Games/src/MonolithFinancial/build/CMakeFiles/MonolithFinancial.dir
-C:/Users/auora/StudioProjects/Monolith-Games/src/MonolithFinancial/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/auora/StudioProjects/Monolith-Games/src/MonolithFinancial/build/CMakeFiles/ZERO_CHECK.dir
