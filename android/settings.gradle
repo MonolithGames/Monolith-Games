@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "Monolith-GameHub"
+include ':launcher'
+include ':gamehub'
+include ':core'
+include ':ui'
+include ':networking'
+include ':analytics'
+include ':authentication'
+include ':games:project-alpha'
+include ':games:project-beta'
+include ':games:project-gamma'
