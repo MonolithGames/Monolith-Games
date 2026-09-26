@@ -11,8 +11,8 @@ android {
         applicationId = "com.monolithgames.calculator"
         minSdk = 21
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 3
+        versionName = "3.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,3 +58,5 @@ dependencies {
     // Unit tests
     testImplementation("junit:junit:4.13.2")
 }
+
+

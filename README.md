@@ -1,15 +1,18 @@
 # Monolith Games
 
-Welcome to the official repository for Monolith Games. This repository adheres to elite A+ enterprise architecture standards, cleanly separating games, platform infrastructure, web applications, branding, legal, and tooling.
+**Founder & Lead Architect**: Mike  
+**Studio**: Monolith Games Inc.  
+
+Welcome to the official repository for Monolith Games. Engineered by Mike, this platform adheres to elite A+ enterprise architecture standards, cleanly separating games, platform infrastructure, web applications, branding, legal, and tooling.
 
 ## Repository Directory Map
 
 | Directory | Description |
 | :--- | :--- |
 | **`android/`** | Mobile applications and Android launchers |
-| **`games/`** | Pure game titles (*AetherDrift*, *KineticsZero*, *ChronosBreach*, etc.) |
+| **`games/`** | Pure game titles (*VoidStrikers*, *IslandMonolith3D*, *Arcade*, *Enterprise*, *Incorporated*, *Genres*) |
 | **`platform/`** | Monolith infrastructure (`launcher/`, `store/`, `telemetry/`, `editor/`, `publishing/`, `shared/`) |
-| **`web/`** | Company websites and admin web dashboards |
+| **`web/`** | Company websites, `MonolithGames.com`, `Auora.com`, and `I.com` portals |
 | **`backend/`** | Cloud microservices, auth, and telemetry backends |
 | **`assets/`** | Global textures, audio, models, and UI art assets |
 | **`branding/`**| Company logos, icons, marketing art, and store assets |

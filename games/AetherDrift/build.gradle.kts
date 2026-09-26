@@ -11,8 +11,8 @@ android {
         applicationId = "com.monolith.aetherdrift"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 3
+        versionName = "3.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,3 +50,5 @@ dependencies {
     implementation("com.android.billingclient:billing-ktx:6.1.0")
     implementation("com.google.android.gms:play-services-ads:22.6.0")
 }
+
+

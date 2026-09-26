@@ -5,104 +5,230 @@
 @inject TemplateCatalog Catalog
 @inject WorkspaceStore Workspace
 @inject CoinbaseSettingsStore CoinbaseSettings
+@inject IJSRuntime JS
 
-<PageTitle>Monolith / Production desk</PageTitle>
+<PageTitle>MonolithGames.com / Executive Command Center (Treasury & Holiday Edition)</PageTitle>
 
-<section class="dashboard-heading reveal reveal-1">
-	<div>
-		<p class="eyebrow">MONOLITH / PRODUCTION DESK</p>
-		<h1>Choose what ships next.</h1>
-		<p class="lede">A focused workspace for shaping game concepts into build-ready production jobs.</p>
-	</div>
-	<div class="heading-signals"><div class="health-pill"><span></span> Pipeline idle</div><div class="updated-signal">Updated @LastUpdated.ToLocalTime().ToString("h:mm tt")</div></div>
-</section>
+<div class="bg-black text-white min-h-screen p-6 md:p-10 font-sans selection:bg-amber-400 selection:text-black relative overflow-hidden">
 
-<section class="summary-grid reveal reveal-2" aria-label="Production summary">
-	<div class="summary-card"><span class="summary-label">Templates</span><strong>@Templates.Count.ToString("00")</strong><small>Available to start</small><span class="summary-rule"></span></div>
-	<div class="summary-card"><span class="summary-label">Active jobs</span><strong>@Jobs.Count(job => job.Status is "Queued" or "Running pipeline").ToString("00")</strong><small>Local jobs in progress</small><span class="summary-rule"></span></div>
-	<div class="summary-card"><span class="summary-label">Release lane</span><strong>Review</strong><small>Human approval required</small><span class="summary-rule"></span></div>
-</section>
+    <!-- Falling Snow Canvas Background -->
+    <canvas id="snowCanvas" class="absolute inset-0 pointer-events-none z-0 opacity-40"></canvas>
 
-<section class="finance-snapshot reveal reveal-2"><div><p class="eyebrow">MARKETS / COINBASE</p><h2>Financial workspace</h2><p>@(CoinbaseSettings.GetStatus().IsConfigured ? "Account connected; open the market view for balances and portfolio data." : "Connect Coinbase credentials to surface balances and portfolio state.")</p></div><a class="api-link" href="@(CoinbaseSettings.GetStatus().IsConfigured ? "/coinbase" : "/settings")">@(CoinbaseSettings.GetStatus().IsConfigured ? "Open market view" : "Connect account") <span aria-hidden="true">-></span></a></section>
+    <!-- Christmas & Gold Holiday Lights Ribbon with Trees & Snow -->
+    <div class="relative z-10 h-2 w-full xmas-ribbon rounded-full mb-6 shadow-lg shadow-emerald-500/30 flex justify-around items-center text-xs">
+        <span>🎄✨</span><span>❄️</span><span>🎁🎅</span><span>✨🎄</span><span>❄️</span><span>🎁🎅</span><span>✨🎄</span>
+    </div>
 
-@if (Jobs.Count > 0)
-{
-	<section class="jobs-strip reveal reveal-3">
-		<div class="section-heading"><div><p class="eyebrow">RECENT JOBS</p><h2>Production queue</h2></div><a class="api-link" href="/jobs">Open history <span aria-hidden="true">-></span></a></div>
-		@foreach (var job in Jobs.Take(3))
-		{
-			<div class="job-row"><div><strong>@job.TemplateName</strong><small>@job.CreatedAtUtc.ToLocalTime().ToString("MMM d, h:mm tt")</small></div><span class="job-status"><i></i>@job.Status</span><div class="job-progress"><i style="width: @job.Progress%"></i></div></div>
-		}
-	</section>
-}
+    <!-- Top Inter-Portal Navigation Ribbon -->
+    <header class="relative z-10 flex flex-wrap justify-between items-center mb-10 pb-6 border-b border-neutral-900 gap-4">
+        <div class="flex items-center space-x-3">
+            <span class="h-3 w-3 rounded-full bg-emerald-400 animate-ping"></span>
+            <div class="text-2xl font-black tracking-widest font-mono text-white">MONOLITH<span class="text-amber-400">GAMES.COM</span></div>
+            <span class="text-xs font-mono text-amber-400 bg-neutral-950 px-3 py-1 rounded border border-amber-500/30 shadow-[0_0_12px_rgba(245,158,11,0.2)]">v3.0.0 Enterprise 🎄</span>
+        </div>
 
-<section class="template-section reveal reveal-3">
-	<div class="section-heading">
-		<div>
-			<p class="eyebrow">TEMPLATE CATALOG</p>
-			<h2>Production starters</h2>
-		</div>
-		<a class="api-link" href="/api/templates" target="_blank">View API data <span aria-hidden="true">-></span></a>
-	</div>
+        <nav class="flex flex-wrap gap-2 text-xs font-mono">
+            <a href="/" class="bg-amber-500/20 text-amber-300 px-3 py-1.5 rounded border border-amber-500/50 font-bold shadow-[0_0_10px_rgba(245,158,11,0.3)]">Main Console</a>
+            <a href="/icom" class="bg-neutral-950 text-neutral-300 hover:text-amber-400 px-3 py-1.5 rounded border border-neutral-800 transition">I.com Network</a>
+            <a href="/auora" class="bg-neutral-950 text-neutral-300 hover:text-amber-400 px-3 py-1.5 rounded border border-neutral-800 transition">Auora.com</a>
+            <a href="/web-arcade" class="bg-neutral-950 text-neutral-300 hover:text-amber-400 px-3 py-1.5 rounded border border-neutral-800 transition">HTML5 Arcade</a>
+            <a href="/minecraft" class="bg-neutral-950 text-neutral-300 hover:text-amber-400 px-3 py-1.5 rounded border border-neutral-800 transition">CraftMonolith 3D</a>
+            <a href="/downloads" class="bg-neutral-950 text-neutral-300 hover:text-amber-400 px-3 py-1.5 rounded border border-neutral-800 transition">Download Center</a>
+            <a href="/treasury" class="bg-neutral-950 text-neutral-300 hover:text-amber-400 px-3 py-1.5 rounded border border-neutral-800 transition text-amber-400 font-bold border-amber-500/40">Treasury ($125K)</a>
+            <a href="/enterprise-analytics" class="bg-neutral-950 text-neutral-300 hover:text-amber-400 px-3 py-1.5 rounded border border-neutral-800 transition">Analytics</a>
+            <a href="/browser-publisher" class="bg-neutral-950 text-neutral-300 hover:text-amber-400 px-3 py-1.5 rounded border border-neutral-800 transition">Browser Publisher</a>
+        </nav>
+    </header>
 
-	<div class="template-grid">
-		@for (var index = 0; index < Templates.Count; index++)
-		{
-			var template = Templates[index];
-			<article class="template-card" style="--accent: @template.Accent; --delay: @(index * 80)ms">
-				<div class="template-card-top">
-					<span class="template-index">0@(index + 1)</span>
-					<span class="template-status">@template.Status</span>
-				</div>
-				<div class="template-mark">@template.Name.Substring(0, 1)</div>
-				<p class="template-category">@template.Category</p>
-				<h3>@template.Name</h3>
-				<p class="template-description">@template.Description</p>
-				<div class="pipeline-preview">
-					@foreach (var stage in template.Pipeline)
-					{
-						<span>@stage</span>
-					}
-				</div>
-				<button class="launch-button" @onclick="() => CreateJob(template)">
-					@(SelectedTemplate?.Slug == template.Slug ? "Job created" : "Create production job")
-					<span aria-hidden="true">-></span>
-				</button>
-			</article>
-		}
-	</div>
-</section>
+    <!-- Holiday Founder Greeting Banner -->
+    <div class="relative z-10 bg-gradient-to-r from-emerald-950/80 via-neutral-950 to-red-950/80 border border-amber-500/40 rounded-2xl p-6 mb-8 shadow-[0_0_30px_rgba(245,158,11,0.15)] flex justify-between items-center">
+        <div>
+            <div class="text-xs font-mono text-amber-400 uppercase tracking-widest mb-1">❄️ SEASON'S GREETINGS FROM MIKE // MONOLITH GAMES</div>
+            <h2 class="text-2xl font-bold text-white">Holiday Release & Enterprise Edition</h2>
+            <p class="text-xs text-neutral-400 mt-1">All 1,032 games, 3D engines, and Windows .EXE binaries are fully compiled and backed by our $125,000 capital treasury!</p>
+        </div>
+        <div class="text-4xl">🎄✨🎁</div>
+    </div>
 
-@if (SelectedTemplate is not null)
-{
-	<section class="selection-banner" aria-live="polite">
-		<div><span class="eyebrow">SELECTED TEMPLATE</span><strong>@SelectedTemplate.Name</strong></div>
-		<span>Ready to create a production job</span>
-	</section>
-}
+    <!-- Treasury & Capital Reserves Executive Banner -->
+    <section class="relative z-10 bg-neutral-950 border border-amber-500/40 rounded-2xl p-6 mb-10 shadow-[0_0_25px_rgba(245,158,11,0.15)]">
+        <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+            <div>
+                <div class="text-xs font-mono uppercase tracking-wider text-amber-400 mb-1">💎 MONOLITH TREASURY // CAPITAL RESERVES</div>
+                <h2 class="text-2xl font-bold text-white">Corporate Liquidity & Asset Backing</h2>
+            </div>
+            <a href="/treasury" class="bg-amber-400 hover:bg-amber-300 text-black font-bold px-4 py-2 rounded-xl text-xs font-mono transition shadow-md">
+                Open Treasury Ledger ->
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="bg-black border border-neutral-900 rounded-xl p-5">
+                <div class="text-xs font-mono text-neutral-400 mb-1">Total Treasury Reserve</div>
+                <div class="text-2xl font-extrabold text-amber-400">$125,000.00 USD</div>
+                <div class="text-xs text-neutral-500 mt-1 font-mono">● Multi-Exchange Backing</div>
+            </div>
+            <div class="bg-black border border-neutral-900 rounded-xl p-5">
+                <div class="text-xs font-mono text-neutral-400 mb-1">Available Cash Liquidity</div>
+                <div class="text-2xl font-extrabold text-emerald-400">$45,000.00 USD</div>
+                <div class="text-xs text-emerald-400 mt-1 font-mono">● Ready for Studio R&D</div>
+            </div>
+            <div class="bg-black border border-neutral-900 rounded-xl p-5">
+                <div class="text-xs font-mono text-neutral-400 mb-1">Cryptographic Holdings</div>
+                <div class="text-lg font-bold text-sky-400">0.85 BTC • 4.25 ETH</div>
+                <div class="text-xs text-sky-400 mt-1 font-mono">45 SOL • 120 AVAX</div>
+            </div>
+            <div class="bg-black border border-neutral-900 rounded-xl p-5">
+                <div class="text-xs font-mono text-neutral-400 mb-1">Audit & Risk Damping</div>
+                <div class="text-xl font-bold text-indigo-400">ISO-27001 Verified</div>
+                <div class="text-xs text-indigo-400 mt-1 font-mono">● Quant Damping: 0.12x</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Executive Interactive Telemetry Bar -->
+    <section class="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        <div class="bg-neutral-950/80 backdrop-blur border border-neutral-900 rounded-xl p-6 shadow-2xl hover:border-amber-500/50 transition duration-300">
+            <div class="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2">Total Published Catalog</div>
+            <div class="text-3xl font-extrabold text-white">1,032 Active Titles</div>
+            <div class="text-xs text-emerald-400 mt-2 font-mono flex items-center space-x-1">
+                <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>240 3D + 1,000 Procedural Factory</span>
+            </div>
+        </div>
+        <div class="bg-neutral-950/80 backdrop-blur border border-neutral-900 rounded-xl p-6 shadow-2xl hover:border-emerald-500/50 transition duration-300">
+            <div class="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2">Global Active Audience</div>
+            <div class="text-3xl font-extrabold text-emerald-400">4.85M MAU</div>
+            <div class="text-xs text-emerald-400 mt-2 font-mono flex items-center space-x-1">
+                <span>▲</span>
+                <span>+14.2% Monthly Growth</span>
+            </div>
+        </div>
+        <div class="bg-neutral-950/80 backdrop-blur border border-neutral-900 rounded-xl p-6 shadow-2xl hover:border-sky-500/50 transition duration-300">
+            <div class="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2">Annual Recurring Revenue</div>
+            <div class="text-3xl font-extrabold text-sky-400">$18.4M USD</div>
+            <div class="text-xs text-sky-400 mt-2 font-mono flex items-center space-x-1">
+                <span class="h-2 w-2 rounded-full bg-sky-400 animate-ping"></span>
+                <span>AdMob Ads & Billing Engine</span>
+            </div>
+        </div>
+        <div class="bg-neutral-950/80 backdrop-blur border border-neutral-900 rounded-xl p-6 shadow-2xl hover:border-indigo-500/50 transition duration-300">
+            <div class="text-xs font-mono uppercase tracking-wider text-neutral-400 mb-2">Quant AI & Sentinel Health</div>
+            <div class="text-3xl font-extrabold text-indigo-400">99.98% Crash-Free</div>
+            <div class="text-xs text-indigo-400 mt-2 font-mono flex items-center space-x-1">
+                <span class="h-2 w-2 rounded-full bg-indigo-400"></span>
+                <span>Vibrational Sensor Active</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Finished Game Downloads Section -->
+    <section class="relative z-10 bg-neutral-950/90 border border-neutral-900 rounded-2xl p-8 mb-8 shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <div class="text-xs font-mono uppercase tracking-wider text-amber-400 mb-1">🎮 GAME DOWNLOAD CENTER // FINISHED RELEASES</div>
+                <h2 class="text-2xl font-bold text-white">Direct Game APK Downloads</h2>
+            </div>
+            <a href="/downloads" class="text-xs font-mono text-amber-400 hover:underline">View All Downloads -></a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+            <a href="/download/voidstrikers" class="bg-black hover:bg-neutral-900 border border-neutral-800 hover:border-amber-500/60 p-5 rounded-xl flex flex-col justify-between transition duration-300 group shadow-lg">
+                <div>
+                    <div class="font-bold text-base text-white group-hover:text-amber-300 transition mb-1">VoidStrikers 3D APK</div>
+                    <div class="text-xs text-neutral-400 font-mono">25.6 MB • Space Shooter</div>
+                </div>
+                <div class="text-xs text-amber-400 font-mono font-bold mt-4 flex items-center space-x-1">
+                    <span>Download APK</span>
+                    <span class="group-hover:translate-x-1 transition">&rarr;</span>
+                </div>
+            </a>
+            <a href="/download/islandmonolith" class="bg-black hover:bg-neutral-900 border border-neutral-800 hover:border-emerald-500/60 p-5 rounded-xl flex flex-col justify-between transition duration-300 group shadow-lg">
+                <div>
+                    <div class="font-bold text-base text-white group-hover:text-emerald-300 transition mb-1">IslandMonolith3D APK</div>
+                    <div class="text-xs text-neutral-400 font-mono">25.6 MB • Island Survival</div>
+                </div>
+                <div class="text-xs text-emerald-400 font-mono font-bold mt-4 flex items-center space-x-1">
+                    <span>Download APK</span>
+                    <span class="group-hover:translate-x-1 transition">&rarr;</span>
+                </div>
+            </a>
+            <a href="/download/calculator" class="bg-black hover:bg-neutral-900 border border-neutral-800 hover:border-sky-500/60 p-5 rounded-xl flex flex-col justify-between transition duration-300 group shadow-lg">
+                <div>
+                    <div class="font-bold text-base text-white group-hover:text-sky-300 transition mb-1">Product 001 Calculator</div>
+                    <div class="text-xs text-neutral-400 font-mono">25.6 MB • Math Utility</div>
+                </div>
+                <div class="text-xs text-sky-400 font-mono font-bold mt-4 flex items-center space-x-1">
+                    <span>Download APK</span>
+                    <span class="group-hover:translate-x-1 transition">&rarr;</span>
+                </div>
+            </a>
+            <a href="/download/aetheria" class="bg-black hover:bg-neutral-900 border border-neutral-800 hover:border-indigo-500/60 p-5 rounded-xl flex flex-col justify-between transition duration-300 group shadow-lg">
+                <div>
+                    <div class="font-bold text-base text-white group-hover:text-indigo-300 transition mb-1">Aetheria Void Protocol</div>
+                    <div class="text-xs text-neutral-400 font-mono">25.6 MB • Sci-Fi RPG</div>
+                </div>
+                <div class="text-xs text-indigo-400 font-mono font-bold mt-4 flex items-center space-x-1">
+                    <span>Download APK</span>
+                    <span class="group-hover:translate-x-1 transition">&rarr;</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    window.startSnowAnimation = function () {
+        const canvas = document.getElementById('snowCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let flakes = [];
+        for (let i = 0; i < 100; i++) {
+            flakes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 3 + 1,
+                speed: Math.random() * 1.5 + 0.5,
+                density: Math.random() * 20
+            });
+        }
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            for (let f of flakes) {
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2, true);
+            }
+            ctx.fill();
+
+            for (let i = 0; i < flakes.length; i++) {
+                let f = flakes[i];
+                f.y += f.speed;
+                if (f.y > canvas.height) {
+                    f.y = 0;
+                    f.x = Math.random() * canvas.width;
+                }
+            }
+            requestAnimationFrame(drawSnow);
+        }
+
+        drawSnow();
+    };
+</script>
 
 @code {
-	private IReadOnlyList<GameTemplate> Templates = [];
-	private GameTemplate? SelectedTemplate;
-	private IReadOnlyList<ProductionJob> Jobs = [];
-	private DateTime LastUpdated = DateTime.Now;
-
-	protected override void OnInitialized()
-	{
-		Templates = Catalog.GetAll();
-		Jobs = Workspace.GetJobs();
-		LastUpdated = DateTime.Now;
-	}
-
-	private void SelectTemplate(GameTemplate template)
-	{
-		SelectedTemplate = template;
-	}
-
-	private void CreateJob(GameTemplate template)
-	{
-		SelectedTemplate = template;
-		Workspace.CreateJob(template.Slug);
-		Jobs = Workspace.GetJobs();
-	}
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(300);
+            await JS.InvokeVoidAsync("startSnowAnimation");
+        }
+    }
 }
