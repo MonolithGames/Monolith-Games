@@ -1,0 +1,51 @@
+@page "/kraken"
+@attribute [Authorize]
+@using System.Text.Json
+@using Monolith.Services
+@inject KrakenReadOnlyClient KrakenClient
+@inject KrakenSettingsStore Settings
+
+<PageTitle>Kraken / Monolith</PageTitle>
+
+<section class="dashboard-heading compact-heading">
+    <div><p class="eyebrow">MARKETS / KRAKEN (MICHIGAN USA)</p><h1>Kraken Exchange Integration.</h1><p class="lede">Michigan-supported spot markets, assets, and ticker data.</p></div>
+    <button class="launch-button" @onclick="Refresh" disabled="@Loading">@(Loading ? "Refreshing..." : "Refresh data") <span aria-hidden="true">-></span></button>
+</section>
+
+@if (!Settings.GetStatus().IsConfigured)
+{
+    <section class="selection-banner"><div><span class="eyebrow">KRAKEN NOT CONFIGURED</span><strong>Optional API credentials can be added. Public data is accessible below.</strong></div></section>
+}
+
+@if (!string.IsNullOrEmpty(Error)) { <div class="login-error">@Error</div> }
+
+<section class="coinbase-grid">
+    <article class="operation-panel"><p class="eyebrow">ASSETS</p><h2>Kraken Supported Assets</h2><pre class="json-output">@(KrakenAssets?.GetRawText() ?? "Press refresh to load assets.")</pre></article>
+    <article class="operation-panel"><p class="eyebrow">ASSET PAIRS</p><h2>Trading Pairs</h2><pre class="json-output">@(AssetPairs?.GetRawText() ?? "Press refresh to load asset pairs.")</pre></article>
+</section>
+
+@code {
+    private JsonElement? KrakenAssets;
+    private JsonElement? AssetPairs;
+    private bool Loading;
+    private string? Error;
+
+    private async Task Refresh()
+    {
+        Loading = true;
+        Error = null;
+        try
+        {
+            KrakenAssets = await KrakenClient.GetAssetsAsync(CancellationToken.None);
+            AssetPairs = await KrakenClient.GetAssetPairsAsync(CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+}

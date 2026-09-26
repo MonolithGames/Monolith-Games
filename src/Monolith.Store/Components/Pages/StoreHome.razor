@@ -1,0 +1,41 @@
+@page "/"
+
+<PageTitle>Monolith Store / Official Android Games</PageTitle>
+
+<section class="hero-section">
+    <h1>Monolith App Store.</h1>
+    <p>Download elite A+ Android games built by Monolith Games. Fully integrated with AdMob ads and Google Play In-App Purchases.</p>
+</section>
+
+<section class="games-grid">
+    @foreach (var game in Games)
+    {
+        <div class="game-card">
+            <span class="category-pill">@game.Category</span>
+            <h2>@game.Name</h2>
+            <p>@game.Description</p>
+            <div class="game-footer">
+                <span class="price">@game.Price</span>
+                <a class="download-btn" href="@game.DownloadUrl" download>Download APK <span aria-hidden="true">-></span></a>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    private record GameItem(string Name, string Category, string Description, string Price, string DownloadUrl);
+
+    private List<GameItem> Games =
+    [
+        new("Aetheria: Void Protocol", "Sci-Fi RPG", "High-speed space exploration and void combat with crystal currency.", "Free (IAP)", "#"),
+        new("Kinetics: Zero", "Physics Puzzle", "Precision physics puzzle platformer with gravity manipulation.", "Free (Ad-Supported)", "#"),
+        new("Chronos Breach", "Tactical Strategy", "Time-manipulation strategy game across alternate historical eras.", "Free (IAP)", "#"),
+        new("Nebula Veil", "Space Survival", "Atmospheric deep space survival and stardust resource harvesting.", "Free (IAP)", "#"),
+        new("Valkyrie Ascendant", "Action Combat", "Mythic Valhalla action combat with battle glory progression.", "Free (IAP)", "#"),
+        new("Shattered Horizon", "Colony Builder", "Post-apocalyptic colony expansion and resource outpost management.", "Free (IAP)", "#"),
+        new("Phantom Grid", "Cyberpunk Stealth", "Tactical cyber-infiltration and node hacking puzzle game.", "Free (IAP)", "#"),
+        new("Solaris Drift", "Solar Racing", "High-velocity solar flare racing and engine thermal management.", "Free (IAP)", "#"),
+        new("Abyssal Echo", "Deep Sea Expl.", "Sonar submarine deep-sea trench exploration and artifact retrieval.", "Free (IAP)", "#"),
+        new("Apex Dominion", "Grand Strategy", "Empire building, province conquering, and tribute collection.", "Free (IAP)", "#")
+    ];
+}

@@ -1,0 +1,43 @@
+@page "/gemini"
+@attribute [Authorize]
+@using System.Text.Json
+@using Monolith.Services
+@inject GeminiReadOnlyClient GeminiClient
+@inject GeminiSettingsStore Settings
+
+<PageTitle>Gemini / Monolith</PageTitle>
+
+<section class="dashboard-heading compact-heading">
+    <div><p class="eyebrow">MARKETS / GEMINI (MICHIGAN USA)</p><h1>Gemini Exchange Integration.</h1><p class="lede">Michigan-supported crypto exchange symbols and public ticker data.</p></div>
+    <button class="launch-button" @onclick="Refresh" disabled="@Loading">@(Loading ? "Refreshing..." : "Refresh data") <span aria-hidden="true">-></span></button>
+</section>
+
+@if (!string.IsNullOrEmpty(Error)) { <div class="login-error">@Error</div> }
+
+<section class="coinbase-grid">
+    <article class="operation-panel"><p class="eyebrow">SYMBOLS</p><h2>Gemini Trading Symbols</h2><pre class="json-output">@(Symbols?.GetRawText() ?? "Press refresh to load symbols.")</pre></article>
+</section>
+
+@code {
+    private JsonElement? Symbols;
+    private bool Loading;
+    private string? Error;
+
+    private async Task Refresh()
+    {
+        Loading = true;
+        Error = null;
+        try
+        {
+            Symbols = await GeminiClient.GetSymbolsAsync(CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+}

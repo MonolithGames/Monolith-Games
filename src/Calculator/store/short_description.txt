@@ -1,0 +1,1 @@
+A clear, fast calculator with history, themes, and an ad-free option.

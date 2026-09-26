@@ -1,0 +1,65 @@
+@page "/ai-synthesizer"
+@attribute [Authorize]
+@using Monolith.Services
+@inject AiAgentSynthesizerService SynthesizerService
+
+<PageTitle>AI Agent Synthesizer / Monolith</PageTitle>
+
+<section class="dashboard-heading compact-heading">
+    <div><p class="eyebrow">INTELLIGENCE / SELF-CODING AGENTS</p><h1>AI Agent Synthesizer.</h1><p class="lede">Let the AI write, compile, and deploy custom trading agents on the fly so no market scenario is ever missed.</p></div>
+</section>
+
+<section class="settings-layout">
+    <article class="operation-panel">
+        <p class="eyebrow">CREATE NEW AGENT</p>
+        <h2>Synthesize Trading Agent</h2>
+        <EditForm Model="Input" OnValidSubmit="CreateAgent" class="project-form">
+            <label>Agent Name<input @bind="Input.Name" placeholder="e.g. KrakenArbitrageScraper" required /></label>
+            <label>Trading Scenario Prompt<textarea @bind="Input.Prompt" rows="4" placeholder="Describe the custom market condition or trade scenario you want captured..." required></textarea></label>
+            <button type="submit">Synthesize & Deploy Agent <span aria-hidden="true">-></span></button>
+        </EditForm>
+        @if (Created) { <p class="settings-success">AI agent successfully generated and deployed to live execution loop!</p> }
+    </article>
+
+    <article class="operation-panel">
+        <p class="eyebrow">ACTIVE SYNTHESIZED AGENTS</p>
+        <h2>Deployed Autonomous Agents</h2>
+        @if (Agents.Count == 0)
+        {
+            <p class="muted-copy">No custom AI agents synthesized yet. Create your first one above.</p>
+        }
+        else
+        {
+            @foreach (var agent in Agents)
+            {
+                <div class="balance-row" style="margin-top: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+                    <div>
+                        <strong>@agent.Name</strong> <span style="color: var(--accent-green, #4ade80);">(@agent.Status)</span>
+                        <p style="color: #cbd5e1; font-size: 0.85rem; margin-top: 0.25rem;">Scenario: @agent.StrategyPrompt</p>
+                    </div>
+                    <pre class="json-output" style="margin-top: 0.5rem; font-size: 0.75rem;">@agent.GeneratedCSharpCode</pre>
+                </div>
+            }
+        }
+    </article>
+</section>
+
+@code {
+    private class AgentInput
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Prompt { get; set; } = string.Empty;
+    }
+
+    private AgentInput Input = new();
+    private bool Created;
+    private List<SynthesizedAgent> Agents => SynthesizerService.GetAgents();
+
+    private void CreateAgent()
+    {
+        if (string.IsNullOrWhiteSpace(Input.Name) || string.IsNullOrWhiteSpace(Input.Prompt)) return;
+        SynthesizerService.SynthesizeAgent(Input.Name, Input.Prompt);
+        Input = new();
+        Created = true;
+    }
+}

@@ -1,0 +1,50 @@
+@page "/post-publishing"
+@attribute [Authorize]
+@using Monolith.Services
+@inject PostPublishingTelemetry TelemetryService
+
+<PageTitle>Post-Publishing Telemetry / Monolith</PageTitle>
+
+<section class="dashboard-heading compact-heading">
+    <div>
+        <p class="eyebrow">POST-PUBLISHING / LIVE TELEMETRY</p>
+        <h1>Global Launch & Revenue Monitor.</h1>
+        <p class="lede">Real-time installation telemetry, crash-free rates, and in-app purchase revenue across all published Monolith titles.</p>
+    </div>
+</section>
+
+<section class="summary-grid">
+    <div class="summary-card" style="border-top-color: #4ade80;">
+        <span class="eyebrow">TOTAL ACTIVE INSTALLS</span>
+        <strong>162,820</strong>
+        <small>Across Google Play & Windows</small>
+    </div>
+    <div class="summary-card" style="border-top-color: #60a5fa;">
+        <span class="eyebrow">DAILY REVENUE (IAP + ADS)</span>
+        <strong>$3,293.40</strong>
+        <small>Michigan multi-exchange linked</small>
+    </div>
+    <div class="summary-card" style="border-top-color: #f472b6;">
+        <span class="eyebrow">GLOBAL CRASH-FREE RATE</span>
+        <strong>99.86%</strong>
+        <small>Telemetry stability threshold met</small>
+    </div>
+</section>
+
+<section class="operation-panel">
+    <p class="eyebrow">PORTFOLIO DEPLOYMENT STATUS</p>
+    <h2>Live Title Telemetry</h2>
+    @foreach (var m in TelemetryService.GetMetrics())
+    {
+        <div class="balance-row" style="align-items: center;">
+            <div>
+                <strong>@m.GameName</strong>
+                <span style="display: block; color: var(--win-text-muted); font-size: 0.8rem;">@m.PackageId | @m.Status</span>
+            </div>
+            <div style="text-align: right;">
+                <span style="color: #4ade80; font-weight: 650;">$@m.DailyRevenueUsd.ToString("N2") / day</span>
+                <span style="display: block; color: var(--win-text-muted); font-size: 0.75rem;">Installs: @m.ActiveInstalls.ToString("N0") | Crash-Free: @m.CrashFreeRate.ToString("P2")</span>
+            </div>
+        </div>
+    }
+</section>

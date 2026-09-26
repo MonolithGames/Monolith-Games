@@ -1,0 +1,9 @@
+Monolith Calculator v1.0.0 (Initial Production Release)
+
+What's New in Version 1.0.0:
+- Fast, high-precision BigDecimal calculation engine
+- Clean Jetpack Compose Material 3 dark blue & emerald UI
+- Local calculation history modal sheet with copy & clear controls
+- Full offline support for basic arithmetic operations
+- Integrated Google UMP privacy choices consent flow
+- Optional $0.99 one-time "Remove Ads" upgrade via Google Play Billing

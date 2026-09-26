@@ -1,0 +1,21 @@
+{
+  "publisherName": "Monolith Games",
+  "developerAccount": "Monolith Games Publishing (Michigan USA)",
+  "targetSdk": 34,
+  "minSdk": 24,
+  "monetization": {
+    "adMobAppId": "ca-app-pub-3394000000000000~1000000000",
+    "billingClientVersion": "6.1.0"
+  },
+  "games": [
+    { "name": "Aether Drift", "packageId": "com.monolith.aetherdrift", "category": "Arcade" },
+    { "name": "Calculator", "packageId": "com.monolith.calculator", "category": "Tools" },
+    { "name": "Echo Rider", "packageId": "com.monolith.echorider", "category": "Racing" },
+    { "name": "Neon Blade", "packageId": "com.monolith.neonblade", "category": "Action" },
+    { "name": "Pixel Quest", "packageId": "com.monolith.pixelquest", "category": "Adventure" },
+    { "name": "Quantum Grid", "packageId": "com.monolith.quantumgrid", "category": "Strategy" },
+    { "name": "Quantum Maze 3D", "packageId": "com.monolith.quantummaze3d", "category": "Puzzle 3D" },
+    { "name": "Echo Island 3D", "packageId": "com.monolith.echoisland3d", "category": "Survival 3D" },
+    { "name": "Autonomous Agent 3D", "packageId": "com.monolith.autonomousagent3d", "category": "Simulation 3D" }
+  ]
+}

@@ -1,0 +1,15 @@
+Monolith Calculator (Product 001) MVP Feature Checklist
+
+[x] Opens & Runs Offline
+[x] Addition, Subtraction, Multiplication, Division
+[x] Percentage, Decimal, & Sign Toggle (+/-)
+[x] High-Precision BigDecimal Math Engine
+[x] Division by Zero Error Guard
+[x] Local Calculation History Sheet
+[x] Copy Results & Clear History Controls
+[x] Dark Mode Material 3 UI Theme
+[x] Settings Screen (Privacy Policy, Consent, Restore Purchases)
+[x] Adaptive AdMob Banner Ad Area
+[x] $0.99 Remove Ads IAP Entitlement
+[x] Google UMP Privacy Consent Integration
+[x] Google Play Store Listing & Asset Bundle (/store)

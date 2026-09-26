@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\auora\StudioProjects\Monolith-Games\src\MonolithFinancial\icon_generator.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\auora\StudioProjects\Monolith-Games\src\MonolithFinancial\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{C798EBEC-4481-3976-BF83-CA881C666C16}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+Monolith Calculator Monetization Strategy (Product 001)
+
+1. AdMob Adaptive Banner Ad:
+   - Positioned at the bottom of the screen away from calculation keys.
+   - Non-intrusive, auto-adjusts to phone/tablet screen width.
+
+2. One-Time In-App Purchase ($0.99 SKU: remove_ads):
+   - Non-consumable product processed through Google Play Billing.
+   - Immediately hides all ad banners across the application upon purchase or restore.
+
+3. Privacy & Compliance:
+   - Google User Messaging Platform (UMP) SDK handles GDPR/EEA and regional privacy consent prior to loading ad units.
