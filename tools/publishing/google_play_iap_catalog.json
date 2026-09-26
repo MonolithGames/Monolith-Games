@@ -1,0 +1,30 @@
+[
+    {
+        "price":  ".99",
+        "title":  "Remove Advertisements",
+        "description":  "Permanently disable all interstitial and banner advertisements.",
+        "type":  "inapp",
+        "sku":  "remove_ads"
+    },
+    {
+        "price":  ".99",
+        "title":  "500 In-Game Coins",
+        "description":  "Instantly receive 500 game coins.",
+        "type":  "inapp",
+        "sku":  "coin_pack_small"
+    },
+    {
+        "price":  ".99",
+        "title":  "3,000 In-Game Coins",
+        "description":  "Instantly receive 3,000 game coins + VIP badge.",
+        "type":  "inapp",
+        "sku":  "coin_pack_large"
+    },
+    {
+        "price":  ".99",
+        "title":  "Enterprise Executive Pass",
+        "description":  "Unlock all enterprise simulation features, cluster scaling, and audit tools.",
+        "type":  "inapp",
+        "sku":  "executive_pass"
+    }
+]

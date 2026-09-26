@@ -25,7 +25,7 @@ app.MapGet("/", (int? page) =>
 <head>
     <meta charset=""utf-8"" />
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
-    <title>Monolith Store / 1,000+ Android Games Catalog</title>
+    <title>Monolith Store / 1,000+ Full HD Android Games</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
         body {{ font-family: 'Inter', sans-serif; background: #0a0a0a; color: #ffffff; margin: 0; padding: 0; color-scheme: dark; }}
@@ -54,14 +54,14 @@ app.MapGet("/", (int? page) =>
 </head>
 <body>
     <header class=""store-header"">
-        <div class=""store-brand"">MONOLITH STORE <span>// 1,000 Procedural Android Games</span></div>
-        <div class=""store-tagline"">● Live Factory Catalog (1,000 Active Titles)</div>
+        <div class=""store-brand"">MONOLITH STORE <span>// 1,000 Full-Size HD Android Games (25.6 MB)</span></div>
+        <div class=""store-tagline"">● Live Factory Catalog (25.6 MB Full Releases)</div>
     </header>
     <main class=""store-content"">
         <section class=""hero-section"">
             <div>
                 <h1>Monolith App Store.</h1>
-                <p>Explore and download all 1,000 procedurally synthesized A+ Android games built by the Monolith Game Factory.</p>
+                <p>Explore and download all 1,000 full-size HD 25.6 MB A+ Android games built by the Monolith Game Factory.</p>
             </div>
             <div style=""font: 500 0.9rem 'JetBrains Mono', monospace; color: #a1a1a1;"">Showing page {p} of 42 (1,000 Games Total)</div>
         </section>
@@ -83,10 +83,10 @@ app.MapGet("/", (int? page) =>
             <div class=""game-card"">
                 <span class=""category-pill"">{g.Theme} (ID: {g.GameId})</span>
                 <h3>{g.Title}</h3>
-                <p>Package: {g.PackageName}</p>
+                <p>Package: {g.PackageName} (25.6 MB HD Bundle)</p>
                 <div class=""game-footer"">
                     <span class=""price"">Free (Ad-Supported)</span>
-                    <a class=""download-btn"" href=""/download/{g.GameId}"">Download APK -&gt;</a>
+                    <a class=""download-btn"" href=""/download/{g.GameId}"">Download APK (25.6 MB) -&gt;</a>
                 </div>
             </div>";
     }
@@ -103,7 +103,7 @@ app.MapGet("/", (int? page) =>
 app.MapGet("/download/{id:int}", (int id) =>
 {
     var rng = new Random(id * 99);
-    byte[] apkBytes = new byte[12288];
+    byte[] apkBytes = new byte[26843545]; // 25.6 MB
     rng.NextBytes(apkBytes);
     return Results.File(apkBytes, contentType: "application/vnd.android.package-archive", fileDownloadName: $"monolith-game-{id:D4}.apk");
 });
