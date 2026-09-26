@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+html, body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0a;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    color-scheme: dark;
+}
+
+.store-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.store-header {
+    background: #0d0d0d;
+    border-bottom: 1px solid #222222;
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.store-brand {
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: .05em;
+}
+
+.store-brand span {
+    color: #888;
+    font-weight: 400;
+    font-size: .9rem;
+}
+
+.store-tagline {
+    font: 500 .75rem 'JetBrains Mono', monospace;
+    color: #888;
+}
+
+.store-content {
+    flex: 1;
+    padding: 3rem clamp(1.5rem, 5vw, 6rem);
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.hero-section {
+    margin-bottom: 3.5rem;
+}
+
+.hero-section h1 {
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 .75rem 0;
+}
+
+.hero-section p {
+    color: #a1a1a1;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0;
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+}
+
+.game-card {
+    background: #141414;
+    border: 1px solid #262626;
+    border-radius: 10px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    transition: border-color .2s ease, transform .2s ease;
+}
+
+.game-card:hover {
+    border-color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.category-pill {
+    font: 600 .68rem 'JetBrains Mono', monospace;
+    letter-spacing: .08em;
+    color: #a1a1a1;
+    text-transform: uppercase;
+    margin-bottom: .75rem;
+}
+
+.game-card h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 0 .5rem 0;
+}
+
+.game-card p {
+    color: #a1a1a1;
+    font-size: .92rem;
+    line-height: 1.5;
+    margin: 0 0 1.5rem 0;
+    flex: 1;
+}
+
+.game-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #222222;
+    padding-top: 1.25rem;
+    margin-top: auto;
+}
+
+.price {
+    font: 600 .85rem 'JetBrains Mono', monospace;
+    color: #4ade80;
+}
+
+.download-btn {
+    background: #ffffff;
+    color: #000000;
+    padding: .5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: .85rem;
+    text-decoration: none;
+    transition: opacity .15s ease;
+}
+
+.download-btn:hover {
+    opacity: .9;
+}

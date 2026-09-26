@@ -1,0 +1,43 @@
+@page "/cryptocom"
+@attribute [Authorize]
+@using System.Text.Json
+@using Monolith.Services
+@inject CryptoComReadOnlyClient CryptoComClient
+@inject CryptoComSettingsStore Settings
+
+<PageTitle>Crypto.com / Monolith</PageTitle>
+
+<section class="dashboard-heading compact-heading">
+    <div><p class="eyebrow">MARKETS / CRYPTO.COM (MICHIGAN USA)</p><h1>Crypto.com Exchange Integration.</h1><p class="lede">Michigan-supported spot instruments and market data.</p></div>
+    <button class="launch-button" @onclick="Refresh" disabled="@Loading">@(Loading ? "Refreshing..." : "Refresh data") <span aria-hidden="true">-></span></button>
+</section>
+
+@if (!string.IsNullOrEmpty(Error)) { <div class="login-error">@Error</div> }
+
+<section class="coinbase-grid">
+    <article class="operation-panel"><p class="eyebrow">INSTRUMENTS</p><h2>Crypto.com Instruments</h2><pre class="json-output">@(Instruments?.GetRawText() ?? "Press refresh to load instruments.")</pre></article>
+</section>
+
+@code {
+    private JsonElement? Instruments;
+    private bool Loading;
+    private string? Error;
+
+    private async Task Refresh()
+    {
+        Loading = true;
+        Error = null;
+        try
+        {
+            Instruments = await CryptoComClient.GetInstrumentsAsync(CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+}

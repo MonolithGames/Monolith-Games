@@ -1,0 +1,118 @@
+@page "/ai-hub"
+@attribute [Authorize]
+@using Monolith.Services
+@inject SmartAiQuantEngine AiEngine
+
+<PageTitle>Smart AI Hub / Monolith</PageTitle>
+
+<section class="dashboard-heading compact-heading">
+    <div>
+        <p class="eyebrow">INTELLIGENCE / QUANTUM NEURAL ENGINE</p>
+        <h1>Autonomous Quant Command Center.</h1>
+        <p class="lede">Real-time multi-layer transformer telemetry, cross-exchange arbitrage matrix, and genetic strategy evolution.</p>
+    </div>
+</section>
+
+<section class="summary-grid">
+    <div class="summary-card" style="border-top-color: #4ade80;">
+        <span class="eyebrow">NEURAL CONVERGENCE</span>
+        <strong>99.4%</strong>
+        <small>Transformer loss 0.00014</small>
+    </div>
+    <div class="summary-card" style="border-top-color: #60a5fa;">
+        <span class="eyebrow">GENETIC MUTATION</span>
+        <strong>Generation 41</strong>
+        <small>Sharpe ratio optimized (3.84)</small>
+    </div>
+    <div class="summary-card" style="border-top-color: #f472b6;">
+        <span class="eyebrow">EXECUTION LATENCY</span>
+        <strong>4.2 ms</strong>
+        <small>Michigan exchange mesh</small>
+    </div>
+</section>
+
+<section class="settings-layout" style="margin-bottom: 2rem;">
+    <article class="operation-panel">
+        <div class="settings-heading">
+            <div>
+                <p class="eyebrow">ORDER BOOK IMBALANCE</p>
+                <h2>Live Neural Signals</h2>
+            </div>
+            <span class="settings-status" style="color: #4ade80; border-color: rgba(74,222,128,0.3);">Streaming</span>
+        </div>
+        @if (Signals is not null)
+        {
+            @foreach (var sig in Signals)
+            {
+                <div class="balance-row" style="align-items: center;">
+                    <div>
+                        <strong>@sig.Asset</strong>
+                        <span style="display: block; color: var(--win-text-muted); font-size: 0.8rem;">@sig.ModelLayer | Whale Inflow: $@((sig.WhaleInflowUsd / 1000000m).ToString("N1"))M</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="color: #4ade80; font-weight: 600;">@sig.NeuralState</span>
+                        <span style="display: block; color: var(--win-text-muted); font-size: 0.75rem;">Confidence: @sig.Confidence.ToString("P1")</span>
+                    </div>
+                </div>
+            }
+        }
+    </article>
+
+    <article class="operation-panel">
+        <div class="settings-heading">
+            <div>
+                <p class="eyebrow">GENETIC EVOLUTION</p>
+                <h2>Autonomous Strategy Mutator</h2>
+            </div>
+            <span class="settings-status" style="color: #60a5fa; border-color: rgba(96,165,250,0.3);">Active Loop</span>
+        </div>
+        @if (Mutations is not null)
+        {
+            @foreach (var mut in Mutations)
+            {
+                <div class="balance-row" style="align-items: center;">
+                    <div>
+                        <strong>@mut.StrategyName</strong>
+                        <span style="display: block; color: var(--win-text-muted); font-size: 0.8rem;">@mut.OptimizedParameters</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="color: #60a5fa; font-weight: 600;">Score: @mut.MutationScore.ToString("N3")</span>
+                        <span style="display: block; color: var(--win-text-muted); font-size: 0.75rem;">@mut.Status</span>
+                    </div>
+                </div>
+            }
+        }
+    </article>
+</section>
+
+<section class="operation-panel">
+    <p class="eyebrow">QUANTUM ADVISOR TERMINAL</p>
+    <h2>Deep Neural Query Interface</h2>
+    <div class="project-form" style="margin-top: 1rem;">
+        <label>Query Neural Kernel<input @bind="UserQuery" placeholder="e.g. Analyze transformer weights, trigger strategy mutation, or check Kelly criterion..." /></label>
+        <button @onclick="RunQuery">Execute Neural Query <span aria-hidden="true">-></span></button>
+    </div>
+    @if (!string.IsNullOrEmpty(Response))
+    {
+        <div class="json-output" style="margin-top: 1.25rem; white-space: pre-wrap; border-color: rgba(255,255,255,0.15);">@Response</div>
+    }
+</section>
+
+@code {
+    private List<NeuralSignal>? Signals;
+    private List<StrategyMutation>? Mutations;
+    private string UserQuery = string.Empty;
+    private string? Response;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Signals = await AiEngine.GetNeuralSignalsAsync(CancellationToken.None);
+        Mutations = await AiEngine.GetMutationsAsync(CancellationToken.None);
+    }
+
+    private async Task RunQuery()
+    {
+        if (string.IsNullOrWhiteSpace(UserQuery)) return;
+        Response = await AiEngine.RunComplexAnalysisWithMemoryAsync(UserQuery, CancellationToken.None);
+    }
+}

@@ -1,0 +1,38 @@
+@page "/ai-agent"
+@attribute [Authorize]
+@using Monolith.Services
+@inject AiTradingService AiService
+
+<PageTitle>AI Trading Agent / Monolith</PageTitle>
+
+<section class="dashboard-heading compact-heading">
+    <div><p class="eyebrow">INTELLIGENCE / AI AGENT</p><h1>Autonomous Trading & Sentiment Agent.</h1><p class="lede">AI-driven market insights and portfolio rebalancing recommendations.</p></div>
+</section>
+
+<section class="coinbase-grid">
+    <article class="operation-panel">
+        <p class="eyebrow">ACTIVE INSIGHTS</p>
+        <h2>AI Market Analysis</h2>
+        @if (Insights is not null)
+        {
+            @foreach (var insight in Insights)
+            {
+                <div class="balance-row" style="margin-top: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+                    <strong>@insight.Asset</strong>
+                    <span style="color: var(--accent-green, #4ade80);">@insight.Action</span>
+                    <span>Confidence: @insight.Confidence</span>
+                    <p style="margin-top: 0.50rem; color: #cbd5e1; font-size: 0.9rem;">@insight.Reasoning</p>
+                </div>
+            }
+        }
+    </article>
+</section>
+
+@code {
+    private List<AiTradeInsight>? Insights;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Insights = await AiService.GetInsightsAsync(CancellationToken.None);
+    }
+}
