@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Corporate Cubes</title>
+    <style>
+        body { background: #000; color: #ff5500; text-align: center; font-family: sans-serif; }
+        canvas { background: #111; display: block; margin: 10px auto; border: 3px solid #ff5500; }
+    </style>
+</head>
+<body>
+<h1>Q*bert Corporate Cubes™</h1>
+<p>Color all cubes by stepping on them! Move diagonally using your <b>Arrow Keys</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let player = { r: 0, c: 0 }, enemy = { r: 4, c: 2, step: 0 }, grid = [], score = 0;
+
+    for (let r = 0; r < 5; r++) { grid[r] = []; for (let c = 0; c <= r; c++) grid[r][c] = false; }
+    grid[0][0] = true;
+
+    window.addEventListener('keydown', e => {
+        let nr = player.r, nc = player.c;
+        if (e.key === 'ArrowUp') { nr--; nc--; } else if (e.key === 'ArrowDown') { nr++; nc++; }
+        else if (e.key === 'ArrowLeft') { nr++; } else if (e.key === 'ArrowRight') { nr--; }
+        if (grid[nr] && nc >= 0 && nc <= nr) { player.r = nr; player.c = nc; if(!grid[nr][nc]) { grid[nr][nc] = true; score += 100; } }
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        for (let r = 0; r < 5; r++) {
+            for (let c = 0; c <= r; c++) {
+                let cx = 200 + (c - r / 2) * 50, cy = 80 + r * 50;
+                ctx.fillStyle = grid[r][c] ? '#00ffcc' : '#333399';
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx+20, cy+15); ctx.lineTo(cx, cy+30); ctx.lineTo(cx-20, cy+15); ctx.fill();
+            }
+        }
+        if (++enemy.step % 30 === 0) {
+            enemy.r += Math.random() < 0.5 ? -1 : 0; enemy.c += Math.random() < 0.5 ? -1 : 0;
+            if (enemy.r < 0 || enemy.c < 0 || enemy.c > enemy.r) { enemy = { r: 4, c: 2, step: 0 }; }
+        }
+        let px = 200 + (player.c - player.r / 2) * 50, py = 80 + player.r * 50;
+        ctx.fillStyle = '#ff5500'; ctx.beginPath(); ctx.arc(px, py+10, 8, 0, Math.PI*2); ctx.fill();
+        let ex = 200 + (enemy.c - enemy.r / 2) * 50, ey = 80 + enemy.r * 50;
+        ctx.fillStyle = '#ff0000'; ctx.beginPath(); ctx.arc(ex, ey+10, 8, 0, Math.PI*2); ctx.fill();
+
+        if (player.r === enemy.r && player.c === enemy.c) { alert('Downsized!'); player = {r:0, c:0}; enemy = {r:4, c:2, step:0}; }
+        if (grid.every(row => row.every(cell => cell))) { alert('Promotion Achieved!'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

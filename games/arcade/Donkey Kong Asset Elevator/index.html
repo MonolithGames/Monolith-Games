@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asset Elevator</title>
+    <style>
+        body { background: #1a0d00; color: #ff8800; text-align: center; font-family: sans-serif; }
+        canvas { background: #111; display: block; margin: 10px auto; border: 3px solid #ff8800; }
+    </style>
+</head>
+<body>
+<h1>Donkey Kong Asset Elevator™</h1>
+<p>Scale the corporate tower! Move with <b>Arrow Left/Right</b> and jump over barrels with <b>Arrow Up</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let jumpman = { x: 50, y: 330, vx: 0, vy: 0, jumping: false }, barrels = [], ticks = 0;
+    const platforms = [{x:0, y:360, w:400}, {x:50, y:260, w:350}, {x:0, y:160, w:350}, {x:80, y:70, w:240}];
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') jumpman.vx = -4; if (e.key === 'ArrowRight') jumpman.vx = 4;
+        if (e.key === 'ArrowUp' && !jumpman.jumping) { jumpman.vy = -8; jumpman.jumping = true; }
+    });
+    window.addEventListener('keyup', e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') jumpman.vx = 0; });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#ff1100'; platforms.forEach(p => ctx.fillRect(p.x, p.y, p.w, 10));
+
+        jumpman.x += jumpman.vx; jumpman.vy += 0.4; jumpman.y += jumpman.vy;
+        jumpman.jumping = true;
+        platforms.forEach(p => {
+            if (jumpman.x+15 > p.x && jumpman.x < p.x+p.w && jumpman.y+30 >= p.y && jumpman.y+30 <= p.y+10 && jumpman.vy >= 0) {
+                jumpman.y = p.y - 30; jumpman.vy = 0; jumpman.jumping = false;
+            }
+        });
+
+        if (ticks++ % 80 === 0) barrels.push({ x: 300, y: 50, r: 8, speed: -2, currentPlat: 3 });
+        ctx.fillStyle = '#ffcc00';
+        for (let b = barrels.length - 1; b >= 0; b--) {
+            let bar = barrels[b]; bar.x += bar.speed;
+            let p = platforms[bar.currentPlat];
+            if (bar.x < p.x || bar.x > p.x + p.w) { bar.currentPlat--; if (bar.currentPlat < 0) { barrels.splice(b, 1); continue; } bar.y = platforms[bar.currentPlat].y - 8; bar.speed *= -1; }
+            ctx.beginPath(); ctx.arc(bar.x, bar.y, bar.r, 0, Math.PI * 2); ctx.fill();
+            if (Math.hypot((jumpman.x + 8) - bar.x, (jumpman.y + 15) - bar.y) < 20) { alert('Audit Failed!'); location.reload(); }
+        }
+
+        ctx.fillStyle = '#00ff00'; ctx.fillRect(jumpman.x, jumpman.y, 16, 30);
+        if (jumpman.y < 40) { alert('Ceo Office Reached! Success!'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

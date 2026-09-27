@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Cap Lander</title>
+    <style>
+        body { background: #030303; color: #ffffff; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #ffffff; }
+    </style>
+</head>
+<body>
+<h1>Lunar Lander Budget Cap™</h1>
+<p>Perform a soft landing onto the platform target. Rotate using <b>Left/Right Arrows</b> and apply thrust with <b>Up Arrow</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let lander = { x: 180, y: 50, vx: 1, vy: 0, angle: 0, fuel: 100 };
+    const target = { x: 160, y: 360, w: 60 };
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') lander.angle -= 0.15; if (e.key === 'ArrowRight') lander.angle += 0.15;
+        if (e.key === 'ArrowUp' && lander.fuel > 0) { lander.vx += Math.sin(lander.angle) * 0.2; lander.vy -= Math.cos(lander.angle) * 0.2; lander.fuel--; }
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#00ff00'; ctx.fillRect(target.x, target.y, target.w, 8); // Platform
+
+        lander.vy += 0.04; lander.x += lander.vx; lander.y += lander.vy;
+
+        ctx.save(); ctx.translate(lander.x, lander.y); ctx.rotate(lander.angle);
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-10, 10); ctx.lineTo(0, -15); ctx.lineTo(10, 10); ctx.closePath(); ctx.stroke(); ctx.restore();
+
+        ctx.font = '14px sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText('Fuel Resource: ' + lander.fuel + '%', 15, 25);
+        ctx.fillText('Velocity: ' + lander.vy.toFixed(2), 15, 45);
+
+        if (lander.y >= target.y - 10) {
+            if (lander.x > target.x && lander.x < target.x + target.w && lander.vy < 1.2 && Math.abs(lander.angle) < 0.2) { alert('Optimal Operational Landing Successful!'); }
+            else { alert('Structural Deficit: Impact Destructive.'); }
+            location.reload();
+        } else if (lander.x < 0 || lander.x > 400 || lander.y > 400) { alert('Out of Bounds.'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

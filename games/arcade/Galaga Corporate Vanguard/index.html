@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Galaga Corporate Vanguard</title>
+    <style>
+        body { background: #020208; color: #ff00ff; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #ff00ff; }
+    </style>
+</head>
+<body>
+<h1>Galaga Corporate Vanguard™</h1>
+<p>Intercept the falling sector disruptions! Move with <b>Arrow Left/Right</b> and shoot with <b>Spacebar</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let player = { x: 185, y: 360, w: 30, h: 20 }, lasers = [], enemies = [], ticks = 0, score = 0;
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && player.x > 0) player.x -= 20;
+        if (e.key === 'ArrowRight' && player.x < 370) player.x += 20;
+        if (e.key === ' ' || e.key === 'Spacebar') lasers.push({ x: player.x + 13, y: player.y, w: 4, h: 12 });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#00ffff'; ctx.fillRect(player.x, player.y, player.w, player.h);
+
+        if (ticks++ % 30 === 0) enemies.push({ x: Math.random() * 370, y: 0, w: 25, h: 20, speed: Math.random() * 2 + 1 });
+
+        ctx.fillStyle = '#ff00ff';
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            enemies[i].y += enemies[i].speed;
+            ctx.fillRect(enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h);
+            if (enemies[i].y > 360 && Math.abs(enemies[i].x - player.x) < 30) { alert('Vanguard Destroyed!'); location.reload(); }
+            if (enemies[i].y > 400) enemies.splice(i, 1);
+        }
+
+        ctx.fillStyle = '#ffff00';
+        for (let l = lasers.length - 1; l >= 0; l--) {
+            lasers[l].y -= 6;
+            ctx.fillRect(lasers[l].x, lasers[l].y, lasers[l].w, lasers[l].h);
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                if (lasers[l] && lasers[l].x > enemies[i].x && lasers[l].x < enemies[i].x + enemies[i].w && lasers[l].y > enemies[i].y && lasers[l].y < enemies[i].y + enemies[i].h) {
+                    enemies.splice(i, 1); lasers.splice(l, 1); score += 50; break;
+                }
+            }
+            if (lasers[l] && lasers[l].y < 0) lasers.splice(l, 1);
+        }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

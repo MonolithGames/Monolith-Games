@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BurgerTime Executive Chef</title>
+    <style>
+        body { background: #1a1510; color: #ffcc00; text-align: center; font-family: sans-serif; }
+        canvas { background: #111; display: block; margin: 10px auto; border: 3px solid #ffcc00; }
+    </style>
+</head>
+<body>
+<h1>BurgerTime Executive Chef™</h1>
+<p>Walk over the ingredients to drop them and assemble the orders! Dodge corporate rivals with <b>Arrows</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let chef = { x: 4, y: 1 }, pickle = { x: 14, y: 13, dx: 1 }, layers = [], partsLeft = 8;
+    const floors =, ladders =; // Grid coordinates (tiles)
+
+    for(let i=0; i<4; i++) { layers.push({x: 2+i*4, y: 7, stepped: false}, {x: 2+i*4, y: 11, stepped: false}); }
+
+    window.addEventListener('keydown', e => {
+        let nx = chef.x, ny = chef.y;
+        if (e.key === 'ArrowLeft') nx--; else if (e.key === 'ArrowRight') nx++;
+        else if (e.key === 'ArrowUp' && ladders.includes(chef.x)) ny--; else if (e.key === 'ArrowDown' && ladders.includes(chef.x)) ny++;
+        if (nx >= 0 && nx < 20 && (floors.includes(ny) || ladders.includes(nx))) { chef.x = nx; chef.y = ny; }
+        layers.forEach(l => { if (chef.x >= l.x && chef.x <= l.x+2 && chef.y === l.y && !l.stepped) { l.stepped = true; l.y += 4; partsLeft--; } });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#555'; ladders.forEach(lx => ctx.fillRect(lx*20+6, 40, 8, 300));
+        ctx.fillStyle = '#8B4513'; floors.forEach(fy => ctx.fillRect(20, fy*20+16, 360, 4));
+
+        ctx.fillStyle = '#FFA500'; layers.forEach(l => ctx.fillRect(l.x*20, l.y*20+8, 40, 8)); // Ingredients
+        if (Math.random() < 0.1) { pickle.x += pickle.dx; if(pickle.x < 1 || pickle.x > 18) pickle.dx *= -1; }
+
+        ctx.fillStyle = '#00FFFF'; ctx.fillRect(chef.x*20, chef.y*20, 20, 20); // Chef
+        ctx.fillStyle = '#00FF00'; ctx.fillRect(pickle.x*20, pickle.y*20, 20, 20); // Enemy
+
+        if (chef.x === pickle.x && chef.y === pickle.y) { alert('Market Share Lost!'); location.reload(); }
+        if (partsLeft <= 0) { alert('Orders Completed!'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

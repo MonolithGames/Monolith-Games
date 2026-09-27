@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asteroids Enterprise</title>
+    <style>
+        body { background: #0a0a10; color: #00ffff; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #00ffff; }
+    </style>
+</head>
+<body>
+<h1>Asteroids Enterprise™</h1>
+<p>Use <b>Arrow Left/Right</b> to rotate, <b>Arrow Up</b> to thrust, and <b>Spacebar</b> to fire.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let ship = {x: 200, y: 200, r: 12, a: 0, v: {x: 0, y: 0}}, rocks = [], lasers = [], score = 0;
+
+    for (let i = 0; i < 5; i++) spawnRock();
+    function spawnRock() { rocks.push({x: Math.random()*400, y: Math.random()*100, s: 20, v: {x: (Math.random()-0.5)*3, y: (Math.random()-0.5)*3}}); }
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') ship.a -= 0.3;
+        if (e.key === 'ArrowRight') ship.a += 0.3;
+        if (e.key === 'ArrowUp') { ship.v.x += Math.cos(ship.a)*0.8; ship.v.y += Math.sin(ship.a)*0.8; }
+        if (e.key === ' ' || e.key === 'Spacebar') lasers.push({x: ship.x, y: ship.y, v: {x: Math.cos(ship.a)*6, y: Math.sin(ship.a)*6}, t: 0});
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ship.x = (ship.x + ship.v.x + 400) % 400; ship.y = (ship.y + ship.v.y + 400) % 400;
+        ship.v.x *= 0.98; ship.v.y *= 0.98;
+
+        ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2; ctx.beginPath();
+        ctx.moveTo(ship.x + Math.cos(ship.a)*ship.r, ship.y + Math.sin(ship.a)*ship.r);
+        ctx.lineTo(ship.x + Math.cos(ship.a+2.5)*ship.r, ship.y + Math.sin(ship.a+2.5)*ship.r);
+        ctx.lineTo(ship.x + Math.cos(ship.a-2.5)*ship.r, ship.y + Math.sin(ship.a-2.5)*ship.r);
+        ctx.closePath(); ctx.stroke();
+
+        ctx.fillStyle = '#ff00ff';
+        for(let l=lasers.length-1; l>=0; l--) {
+            let p = lasers[l]; p.x = (p.x + p.v.x + 400) % 400; p.y = (p.y + p.v.y + 400) % 400;
+            ctx.fillRect(p.x-2, p.y-2, 4, 4);
+            if(p.t++ > 40) lasers.splice(l, 1);
+        }
+
+        ctx.strokeStyle = '#ffffff';
+        for(let r=rocks.length-1; r>=0; r--) {
+            let rk = rocks[r]; rk.x = (rk.x + rk.v.x + 400) % 400; rk.y = (rk.y + rk.v.y + 400) % 400;
+            ctx.beginPath(); ctx.arc(rk.x, rk.y, rk.s, 0, Math.PI*2); ctx.stroke();
+
+            if (Math.hypot(ship.x - rk.x, ship.y - rk.y) < rk.s + 6) { alert('Game Over!'); ship.x=200; ship.y=200; ship.v={x:0,y:0}; score=0; }
+
+            for(let l=lasers.length-1; l>=0; l--) {
+                if (Math.hypot(lasers[l].x - rk.x, lasers[l].y - rk.y) < rk.s) {
+                    lasers.splice(l, 1); score += 20;
+                    if (rk.s > 10) { rk.s /= 2; rk.v.x *= 1.5; rk.v.y *= 1.5; spawnRock(); } else { rocks.splice(r, 1); }
+                    break;
+                }
+            }
+        }
+        if (rocks.length === 0) { alert('Victory!'); for(let i=0; i<5; i++) spawnRock(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dig Dug Extraction</title>
+    <style>
+        body { background: #261a0d; color: #ffaa00; text-align: center; font-family: sans-serif; }
+        canvas { background: #e6994d; display: block; margin: 10px auto; border: 3px solid #ffaa00; }
+    </style>
+</head>
+<body>
+<h1>Dig Dug Extraction™</h1>
+<p>Clear out sections of the dirt layer! Control the extraction probe using your <b>Arrow Keys</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    const size = 20, tiles = 20;
+    let player = { x: 10, y: 2 }, enemy = { x: 5, y: 12, dx: 1 }, grid = [];
+
+    for (let x = 0; x < tiles; x++) {
+        grid[x] = []; for (let y = 0; y < tiles; y++) grid[x][y] = y > 4;
+    }
+
+    window.addEventListener('keydown', e => {
+        let nx = player.x, ny = player.y;
+        if (e.key === 'ArrowLeft') nx--; else if (e.key === 'ArrowRight') nx++;
+        else if (e.key === 'ArrowUp') ny--; else if (e.key === 'ArrowDown') ny++;
+        if (nx >= 0 && nx < tiles && ny >= 0 && ny < tiles) { player.x = nx; player.y = ny; grid[nx][ny] = false; }
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        for (let x = 0; x < tiles; x++) {
+            for (let y = 0; y < tiles; y++) {
+                if (grid[x][y]) { ctx.fillStyle = '#804d1a'; ctx.fillRect(x*size, y*size, size, size); }
+            }
+        }
+        if (Math.random() < 0.05) {
+            let nex = enemy.x + enemy.dx;
+            if (nex < 2 || nex > 17) enemy.dx *= -1; else enemy.x = nex;
+        }
+        ctx.fillStyle = '#00ffff'; ctx.fillRect(player.x*size+2, player.y*size+2, size-4, size-4);
+        ctx.fillStyle = '#ff0033'; ctx.fillRect(enemy.x*size+2, enemy.y*size+2, size-4, size-4);
+
+        if (player.x === enemy.x && player.y === enemy.y) { alert('Extraction Interrupted!'); player = {x:10, y:2}; }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

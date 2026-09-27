@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Corporate Breakout</title>
+    <style>
+        body { background: #0c0014; color: #ff007f; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #ff007f; }
+    </style>
+</head>
+<body>
+<h1>Corporate Breakout™</h1>
+<p>Break down the barrier structures! Move the paddle with your <b>Arrow Keys</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let paddle = { x: 160, y: 370, w: 80, h: 12 }, ball = { x: 200, y: 200, dx: 3, dy: -3, r: 6 }, bricks = [];
+
+    for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 8; c++) { bricks.push({ x: c * 48 + 10, y: r * 20 + 40, w: 42, h: 15, active: true }); }
+    }
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && paddle.x > 0) paddle.x -= 25;
+        if (e.key === 'ArrowRight' && paddle.x < 320) paddle.x += 25;
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ball.x += ball.dx; ball.y += ball.dy;
+
+        if (ball.x < 5 || ball.x > 395) ball.dx *= -1;
+        if (ball.y < 5) ball.dy *= -1;
+        if (ball.y > 395) { alert('Game Over!'); location.reload(); }
+
+        if (ball.x > paddle.x && ball.x < paddle.x + paddle.w && ball.y + ball.r > paddle.y && ball.y - ball.r < paddle.y + paddle.h) ball.dy = -Math.abs(ball.dy);
+
+        ctx.fillStyle = '#00ffff';
+        bricks.forEach(b => {
+            if (!b.active) return;
+            ctx.fillRect(b.x, b.y, b.w, b.h);
+            if (ball.x > b.x && ball.x < b.x + b.w && ball.y > b.y && ball.y < b.y + b.h) { b.active = false; ball.dy *= -1; }
+        });
+
+        ctx.fillStyle = '#ff007f'; ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
+        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2); ctx.fill();
+
+        if (bricks.every(b => !b.active)) { alert('Victory!'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

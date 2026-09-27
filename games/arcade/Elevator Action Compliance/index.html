@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Elevator Action Compliance</title>
+    <style>
+        body { background: #0c0f12; color: #38bdf8; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #38bdf8; }
+    </style>
+</head>
+<body>
+<h1>Elevator Action Compliance™</h1>
+<p>Ride elevators to navigate floors. Shoot agents with <b>Space</b> and move using your <b>Arrow Keys</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let agent = { x: 60, y: 70 }, el = { y: 60, dir: 1 }, lasers = [], spy = { x: 300, y: 70, dx: -1 };
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && agent.x > 20) agent.x -= 15;
+        if (e.key === 'ArrowRight' && agent.x < 360) agent.x += 15;
+        if (agent.x > 180 && agent.x < 220 && Math.abs(agent.y - (el.y+10)) < 15) {
+            if (e.key === 'ArrowUp' && el.y > 60) { el.y -= 10; agent.y -= 10; }
+            if (e.key === 'ArrowDown' && el.y < 280) { el.y += 10; agent.y += 10; }
+        }
+        if (e.key === ' ' || e.key === 'Spacebar') lasers.push({ x: agent.x, y: agent.y+10, dx: -6 });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#334155'; [100, 200, 300, 400].forEach(y => ctx.fillRect(10, y, 380, 8)); // Floors
+
+        ctx.fillStyle = '#0284c7'; ctx.fillRect(185, el.y, 30, 40); // Elevator Shaft Car
+        spy.x += spy.dx * 1.5; if (spy.x < 20 || spy.x > 360) spy.dx *= -1;
+        ctx.fillStyle = '#ef4444'; ctx.fillRect(spy.x, spy.y, 16, 30); // Enemy Corporate Spy
+
+        ctx.fillStyle = '#38bdf8'; ctx.fillRect(agent.x, agent.y, 16, 30); // Player
+
+        ctx.fillStyle = '#ffff00';
+        for (let l = lasers.length - 1; l >= 0; l--) {
+            lasers[l].x += lasers[l].dx; ctx.fillRect(lasers[l].x, lasers[l].y, 6, 3);
+            if (lasers[l].x > spy.x && lasers[l].x < spy.x+16 && lasers[l].y > spy.y && lasers[l].y < spy.y+30) { alert('Spy Neutralized!'); location.reload(); }
+            if (lasers[l].x < 0 || lasers[l].x > 400) lasers.splice(l, 1);
+        }
+        if (Math.abs(agent.x - spy.x) < 15 && agent.y === spy.y) { alert('Compromised!'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pong Syndicate</title>
+    <style>
+        body { background: #000; color: #fff; text-align: center; font-family: monospace; }
+        canvas { background: #111; display: block; margin: 10px auto; border: 4px solid #fff; }
+    </style>
+</head>
+<body>
+<h1>Pong Syndicate™</h1>
+<p>Defeat the systemic automated AI! Control your paddle using <b>Arrow Up / Arrow Down</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let p1 = { y: 160, w: 10, h: 80 }, p2 = { y: 160, w: 10, h: 80 };
+    let ball = { x: 200, y: 200, dx: 4, dy: 3, r: 6 }, s1 = 0, s2 = 0;
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowUp' && p1.y > 0) p1.y -= 20;
+        if (e.key === 'ArrowDown' && p1.y < 320) p1.y += 20;
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ball.x += ball.dx; ball.y += ball.dy;
+
+        // Simple Automation AI Tracking
+        if (ball.y < p2.y + 40 && p2.y > 0) p2.y -= 3;
+        if (ball.y > p2.y + 40 && p2.y < 320) p2.y += 3;
+
+        if (ball.y < 5 || ball.y > 395) ball.dy *= -1;
+
+        if (ball.x < 20 && ball.y > p1.y && ball.y < p1.y + p1.h) { ball.dx = Math.abs(ball.dx) + 0.2; ball.dy += (ball.y - (p1.y+40))*0.1; }
+        if (ball.x > 380 && ball.y > p2.y && ball.y < p2.y + p2.h) { ball.dx = -Math.abs(ball.dx) - 0.2; ball.dy += (ball.y - (p2.y+40))*0.1; }
+
+        if (ball.x < 0) { s2++; reset(); }
+        if (ball.x > 400) { s1++; reset(); }
+
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(10, p1.y, p1.w, p1.h); ctx.fillRect(380, p2.y, p2.w, p2.h);
+        ctx.fillRect(ball.x-ball.r, ball.y-ball.r, ball.r*2, ball.r*2);
+
+        ctx.font = '20px monospace'; ctx.fillText(s1, 150, 30); ctx.fillText(s2, 240, 30);
+        requestAnimationFrame(loop);
+    }
+    function reset() { ball.x = 200; ball.y = 200; ball.dx = ball.dx > 0 ? -4 : 4; ball.dy = 3; }
+    loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Firewall Command</title>
+    <style>
+        body { background: #000; color: #ff3333; text-align: center; font-family: monospace; }
+        canvas { background: #050510; display: block; margin: 10px auto; border: 3px solid #ff3333; }
+    </style>
+</head>
+<body>
+<h1>Missile Command Firewall™</h1>
+<p>Intercept vectors before they hit data nodes! <b>Click on Canvas</b> to deploy intercept bursts.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let threats = [], baseBursts = [], ticks = 0;
+
+    canvas.addEventListener('click', e => {
+        const rect = canvas.getBoundingClientRect();
+        baseBursts.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, r: 2, maxR: 35, growing: true });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#00ff00'; ctx.fillRect(0, 380, 400, 20);
+
+        if (ticks++ % 40 === 0) threats.push({ sx: Math.random()*400, sy: 0, tx: Math.random()*400, ty: 380, pct: 0 });
+
+        ctx.strokeStyle = '#ff3333'; ctx.lineWidth = 1.5;
+        for (let t = threats.length - 1; t >= 0; t--) {
+            let th = threats[t]; th.pct += 0.005;
+            let cx = th.sx + (th.tx - th.sx) * th.pct, cy = th.sy + (th.ty - th.sy) * th.pct;
+            ctx.beginPath(); ctx.moveTo(th.sx, th.sy); ctx.lineTo(cx, cy); ctx.stroke();
+            if (th.pct >= 1) { alert('Firewall Breached!'); location.reload(); }
+
+            for (let b = baseBursts.length - 1; b >= 0; b--) {
+                if (Math.hypot(cx - baseBursts[b].x, cy - baseBursts[b].y) < baseBursts[b].r) { threats.splice(t, 1); break; }
+            }
+        }
+
+        for (let b = baseBursts.length - 1; b >= 0; b--) {
+            let bu = baseBursts[b];
+            if (bu.growing) { bu.r += 1.5; if (bu.r >= bu.maxR) bu.growing = false; } else { bu.r -= 1.5; }
+            if (bu.r <= 0) { baseBursts.splice(b, 1); continue; }
+            ctx.fillStyle = 'rgba(0, 255, 255, 0.4)'; ctx.beginPath(); ctx.arc(bu.x, bu.y, bu.r, 0, Math.PI*2); ctx.fill();
+        }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

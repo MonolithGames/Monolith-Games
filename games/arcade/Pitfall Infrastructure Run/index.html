@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Infrastructure Run</title>
+    <style>
+        body { background: #0f1f11; color: #00ff66; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #00ff66; }
+    </style>
+</head>
+<body>
+<h1>Pitfall Infrastructure Run™</h1>
+<p>Evade corporate hazards! Use <b>Spacebar</b> to leap over shifting liability pits.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let runner = { y: 270, vy: 0, jumping: false }, obstacles = [], speed = 4, score = 0;
+
+    window.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Spacebar') && !runner.jumping) { runner.vy = -10; runner.jumping = true; } });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#8B4513'; ctx.fillRect(0, 300, 400, 100);
+
+        runner.vy += 0.5; runner.y += runner.vy;
+        if (runner.y >= 270) { runner.y = 270; runner.vy = 0; runner.jumping = false; }
+
+        if (Math.random() < 0.015 && obstacles.length === 0) obstacles.push({ x: 400, w: 20, h: 30 });
+
+        ctx.fillStyle = '#ff3300';
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            let obs = obstacles[i]; obs.x -= speed;
+            ctx.fillRect(obs.x, 300 - obs.h, obs.w, obs.h);
+            if (obs.x < -20) { obstacles.splice(i, 1); score += 10; speed += 0.2; }
+            if (obs.x < 50 + 20 && obs.x + obs.w > 50 && runner.y + 30 > 300 - obs.h) { alert('Liquidated! Score: ' + score); location.reload(); }
+        }
+
+        ctx.fillStyle = '#00ff66'; ctx.fillRect(50, runner.y, 20, 30);
+        ctx.font = '16px sans-serif'; ctx.fillText('Score: ' + score, 20, 30);
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

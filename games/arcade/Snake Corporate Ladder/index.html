@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake Corporate Ladder</title>
+    <style>
+        body { background: #191919; color: #ffd700; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #ffd700; }
+    </style>
+</head>
+<body>
+<h1>Snake Corporate Ladder™</h1>
+<p>Climb the ladder and collect the assets! Steer using the <b>Arrow Keys</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    const size = 20, tiles = 20;
+    let snake = [{x: 10, y: 10}], dx = 1, dy = 0, food = {x: 5, y: 5}, score = 0;
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && dx === 0) { dx = -1; dy = 0; }
+        if (e.key === 'ArrowRight' && dx === 0) { dx = 1; dy = 0; }
+        if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -1; }
+        if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = 1; }
+    });
+
+    function loop() {
+        let head = {x: snake[0].x + dx, y: snake[0].y + dy};
+        if (head.x < 0 || head.x >= tiles || head.y < 0 || head.y >= tiles || snake.some(s => s.x === head.x && s.y === head.y)) {
+            alert('Contract Terminated! Score: ' + score); snake = [{x:10, y:10}]; dx=1; dy=0; score=0;
+        }
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) { score += 100; food = {x: Math.floor(Math.random()*tiles), y: Math.floor(Math.random()*tiles)}; } else { snake.pop(); }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ff4444'; ctx.fillRect(food.x*size+2, food.y*size+2, size-4, size-4);
+        ctx.fillStyle = '#ffd700'; snake.forEach(s => ctx.fillRect(s.x*size+1, s.y*size+1, size-2, size-2));
+
+        setTimeout(loop, 100);
+    }
+    loop();
+</script>
+</body>
+</html>

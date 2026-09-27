@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloud Deliveries</title>
+    <style>
+        body { background: #1b1c1e; color: #cbd5e1; text-align: center; font-family: sans-serif; }
+        canvas { background: #334155; display: block; margin: 10px auto; border: 3px solid #cbd5e1; }
+    </style>
+</head>
+<body>
+<h1>Paperboy Cloud Deliveries™</h1>
+<p>Deploy document packets directly into targeting dropboxes! Avoid road hazards with <b>Arrows</b>, throw packets with <b>Space</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let boy = { x: 80, y: 320 }, packets = [], houses = [], hazards = [], score = 0, ticks = 0;
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && boy.x > 20) boy.x -= 15; if (e.key === 'ArrowRight' && boy.x < 160) boy.x += 15;
+        if (e.key === ' ' || e.key === 'Spacebar') packets.push({ x: boy.x + 10, y: boy.y, vx: 5, vy: -3 });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, 200, 400); // Sidewalk
+        ctx.fillStyle = '#64748b'; ctx.fillRect(200, 0, 20, 400); // Curb
+
+        if (ticks++ % 60 === 0) houses.push({ x: 10, y: -40, hit: false });
+        if (ticks % 100 === 0) hazards.push({ x: Math.random()*120 + 40, y: -20 });
+
+        ctx.fillStyle = '#f59e0b';
+        houses.forEach(h => { h.y += 3; ctx.fillRect(h.x, h.y, 40, 40); });
+        ctx.fillStyle = '#ef4444';
+        hazards.forEach(hz => { hz.y += 4; ctx.fillRect(hz.x, hz.y, 20, 20); if (Math.hypot(boy.x-hz.x, boy.y-hz.y) < 20) { alert('Crash!'); location.reload(); } });
+
+        ctx.fillStyle = '#ffffff';
+        for (let p = packets.length - 1; p >= 0; p--) {
+            let pkt = packets[p]; pkt.x += pkt.vx; pkt.y += pkt.vy;
+            ctx.fillRect(pkt.x, pkt.y, 6, 6);
+            houses.forEach(h => {
+                if (!h.hit && pkt.x > h.x && pkt.x < h.x + 40 && pkt.y > h.y && pkt.y < h.y + 40) { h.hit = true; score += 250; packets.splice(p, 1); }
+            });
+            if (pkt.x > 400 || pkt.y < 0) packets.splice(p, 1);
+        }
+
+        ctx.fillStyle = '#38bdf8'; ctx.fillRect(boy.x, boy.y, 20, 35);
+        ctx.font = '16px monospace'; ctx.fillStyle = '#fff'; ctx.fillText('Revenue: $' + score, 260, 30);
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

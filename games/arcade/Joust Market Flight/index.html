@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Joust Market Flight</title>
+    <style>
+        body { background: #1a0000; color: #ffcc00; text-align: center; font-family: sans-serif; }
+        canvas { background: #0a0505; display: block; margin: 10px auto; border: 3px solid #ffcc00; }
+    </style>
+</head>
+<body>
+<h1>Joust Market Flight™</h1>
+<p>Maintain the higher position to eliminate competing units! Flap with <b>Spacebar</b>, move with <b>Arrows</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let player = { x: 100, y: 200, vx: 0, vy: 0 }, enemy = { x: 250, y: 150, vx: 1.5, vy: 0 };
+    const plats = [{x: 0, y: 350, w: 400}, {x: 50, y: 240, w: 120}, {x: 230, y: 180, w: 120}];
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') player.vx = -3; if (e.key === 'ArrowRight') player.vx = 3;
+        if (e.key === ' ' || e.key === 'Spacebar') player.vy = -5.5;
+    });
+    window.addEventListener('keyup', e => { if(e.key === 'ArrowLeft' || e.key === 'ArrowRight') player.vx = 0; });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#994400'; plats.forEach(p => ctx.fillRect(p.x, p.y, p.w, 15));
+
+        player.vy += 0.2; player.x = (player.x + player.vx + 400) % 400; player.y += player.vy;
+        enemy.x = (enemy.x + enemy.vx + 400) % 400; enemy.y += enemy.vy; enemy.vy += 0.15;
+        if (Math.random() < 0.02 && enemy.vy > -2) enemy.vy = -4;
+
+        plats.forEach(p => {
+            if (player.x+16 > p.x && player.x < p.x+p.w && player.y+20 >= p.y && player.y+20 <= p.y+15 && player.vy >= 0) { player.y = p.y - 20; player.vy = 0; }
+            if (enemy.x+16 > p.x && enemy.x < p.x+p.w && enemy.y+20 >= p.y && enemy.y+20 <= p.y+15 && enemy.vy >= 0) { enemy.y = p.y - 20; enemy.vy = 0; }
+        });
+
+        if (Math.hypot(player.x - enemy.x, player.y - enemy.y) < 18) {
+            if (player.y < enemy.y) { alert('Competitor Liquidated!'); enemy.x = Math.random()*300; enemy.y = 100; }
+            else { alert('Hostile Takeover! Game Over.'); player.x = 100; player.y = 200; }
+        }
+
+        ctx.fillStyle = '#00ff00'; ctx.fillRect(player.x, player.y, 16, 20);
+        ctx.fillStyle = '#ff3333'; ctx.fillRect(enemy.x, enemy.y, 16, 20);
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

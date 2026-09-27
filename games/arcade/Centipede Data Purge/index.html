@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Centipede Data Purge</title>
+    <style>
+        body { background: #120024; color: #ff00aa; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #ff00aa; }
+    </style>
+</head>
+<body>
+<h1>Centipede Data Purge™</h1>
+<p>Purge the segment lines! Move with <b>Arrow Keys</b> and shoot with <b>Spacebar</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let ship = { x: 190, y: 360 }, lasers = [], segments = [], blocks = [];
+
+    for (let i = 0; i < 8; i++) segments.push({ x: i * 20, y: 40, dir: 1 });
+    for (let b = 0; b < 15; b++) blocks.push({ x: Math.floor(Math.random() * 19) * 20, y: Math.floor(Math.random() * 12 + 3) * 20 });
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && ship.x > 0) ship.x -= 20; if (e.key === 'ArrowRight' && ship.x < 380) ship.x += 20;
+        if (e.key === 'ArrowUp' && ship.y > 280) ship.y -= 20; if (e.key === 'ArrowDown' && ship.y < 380) ship.y += 20;
+        if (e.key === ' ' || e.key === 'Spacebar') lasers.push({ x: ship.x + 8, y: ship.y, w: 4, h: 10 });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#00ffcc'; blocks.forEach(b => ctx.fillRect(b.x + 2, b.y + 2, 16, 16));
+        ctx.fillStyle = '#ff00aa'; ctx.fillRect(ship.x, ship.y, 20, 20);
+
+        ctx.fillStyle = '#ffff00';
+        segments.forEach(s => {
+            s.x += s.dir * 2;
+            let hitBlock = blocks.some(b => b.y === s.y && s.x + 20 > b.x && s.x < b.x + 20);
+            if (s.x > 380 || s.x < 0 || hitBlock) { s.dir *= -1; s.y += 20; }
+            ctx.fillRect(s.x + 2, s.y + 2, 16, 16);
+            if (Math.hypot(s.x - ship.x, s.y - ship.y) < 15 || s.y > 380) { alert('System Crash!'); location.reload(); }
+        });
+
+        ctx.fillStyle = '#ffffff';
+        for (let l = lasers.length - 1; l >= 0; l--) {
+            lasers[l].y -= 6; ctx.fillRect(lasers[l].x, lasers[l].y, lasers[l].w, lasers[l].h);
+            for (let s = segments.length - 1; s >= 0; s--) {
+                if (lasers[l] && lasers[l].x > segments[s].x && lasers[l].x < segments[s].x + 20 && lasers[l].y > segments[s].y && lasers[l].y < segments[s].y + 20) {
+                    blocks.push({ x: Math.floor(segments[s].x / 20) * 20, y: Math.floor(segments[s].y / 20) * 20 });
+                    segments.splice(s, 1); lasers.splice(l, 1); break;
+                }
+            }
+            if (lasers[l] && lasers[l].y < 0) lasers.splice(l, 1);
+        }
+        if (segments.length === 0) { alert('Clear!'); location.reload(); }
+        setTimeout(() => requestAnimationFrame(loop), 30);
+    }
+    loop();
+</script>
+</body>
+</html>

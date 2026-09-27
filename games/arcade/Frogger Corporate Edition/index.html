@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Frogger Venture</title>
+    <style>
+        body { background: #111; color: #4af; text-align: center; font-family: sans-serif; }
+        canvas { background: #050505; display: block; margin: 10px auto; border: 3px solid #4af; }
+    </style>
+</head>
+<body>
+<h1>Frogger Venture™</h1>
+<p>Cross the corporate traffic safely! Use your <b>Arrow Keys</b> to dodge logs and cars.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let frog = { x: 185, y: 365, w: 30, h: 30 }, rows = [], score = 0;
+
+    for (let i = 0; i < 5; i++) {
+        rows.push({ y: i * 60 + 60, speed: (Math.random() * 2 + 1) * (i % 2 === 0 ? 1 : -1), type: i < 2 ? 'log' : 'car', x: Math.random() * 400 });
+    }
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') frog.x -= 30; if (e.key === 'ArrowRight') frog.x += 30;
+        if (e.key === 'ArrowUp') frog.y -= 60; if (e.key === 'ArrowDown') frog.y += 60;
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#003300'; ctx.fillRect(0, 360, 400, 400); ctx.fillRect(0, 0, 400, 60);
+
+        let onLog = false;
+        rows.forEach(r => {
+            r.x = (r.x + r.speed + 500) % 500 - 50;
+            ctx.fillStyle = r.type === 'log' ? '#8B4513' : '#FF4500';
+            for (let o = 0; o < 3; o++) {
+                let ox = (r.x + o * 150) % 450;
+                ctx.fillRect(ox, r.y + 10, r.type === 'log' ? 80 : 50, 40);
+                let hit = frog.x + 15 > ox && frog.x + 15 < ox + (r.type === 'log' ? 80 : 50) && frog.y + 15 > r.y && frog.y + 15 < r.y + 60;
+                if (hit && r.type === 'car') reset();
+                if (hit && r.type === 'log') { frog.x += r.speed; onLog = true; }
+            }
+        });
+
+        if (frog.y < 300 && frog.y > 60 && !onLog) reset();
+        if (frog.y < 60) { alert('Goal Reached!'); score += 100; reset(); }
+        if (frog.x < 0 || frog.x > 370) reset();
+
+        ctx.fillStyle = '#00FF00'; ctx.fillRect(frog.x, frog.y, frog.w, frog.h);
+        requestAnimationFrame(loop);
+    }
+    function reset() { frog.x = 185; frog.y = 365; }
+    loop();
+</script>
+</body>
+</html>
