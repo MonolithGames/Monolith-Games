@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kung-Fu Master Dojo Escort</title>
+    <style>
+        body { background: #1c0500; color: #ff5500; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #ff5500; }
+    </style>
+</head>
+<body>
+<h1>Kung-Fu Master Dojo Escort™</h1>
+<p>Defend your sector from rushing corporate henchmen! Press <b>Arrow Left/Right</b> to move, <b>Spacebar</b> to strike.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let player = { x: 190, y: 280, facing: 1, action: false, actTimer: 0 }, minions = [], ticks = 0, score = 0;
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') { player.x = Math.max(10, player.x - 15); player.facing = -1; }
+        if (e.key === 'ArrowRight') { player.x = Math.min(370, player.x + 15); player.facing = 1; }
+        if ((e.key === ' ' || e.key === 'Spacebar') && !player.action) { player.action = true; player.actTimer = 8; }
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#64748b'; ctx.fillRect(0, 310, 400, 90); // Floor
+
+        if (ticks++ % 50 === 0) minions.push({ x: Math.random() < 0.5 ? -20 : 420, y: 280, vx: Math.random() < 0.5 ? 2 : -2 });
+
+        if (player.action && --player.actTimer <= 0) player.action = false;
+
+        ctx.fillStyle = '#ff5500'; ctx.fillRect(player.x, player.y, 20, 30); // Player Base
+        if (player.action) { ctx.fillStyle = '#ffff00'; ctx.fillRect(player.facing === 1 ? player.x + 20 : player.x - 15, player.y + 10, 15, 6); } // Strike Matrix
+
+        ctx.fillStyle = '#ef4444';
+        for (let i = minions.length - 1; i >= 0; i--) {
+            let m = minions[i]; m.x += m.vx;
+            ctx.fillRect(m.x, m.y, 20, 30);
+
+            if (player.action && ((player.facing === 1 && m.x > player.x && m.x < player.x + 35) || (player.facing === -1 && m.x < player.x && m.x > player.x - 35))) {
+                minions.splice(i, 1); score += 150; continue;
+            }
+            if (Math.abs(m.x - player.x) < 15) { alert('Market Liquidation Inevitable!'); location.reload(); }
+        }
+        ctx.font = '16px sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText('Score: ' + score, 20, 35);
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

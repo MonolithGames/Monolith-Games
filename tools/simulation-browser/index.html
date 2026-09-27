@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedural Fluid Simulation Engine Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #030712;
+            color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Sidebar layout styling */
+        #sidebar {
+            width: 320px;
+            background: #0b1329;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        h1 { font-size: 18px; margin-bottom: 5px; color: #00f2fe; letter-spacing: 0.5px; }
+        .subtitle { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+        .filter-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .filter-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #9ca3af;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: #00f2fe;
+            color: #030712;
+            border-color: #00f2fe;
+        }
+        .item-list { display: flex; flex-direction: column; gap: 8px; }
+        .sim-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .sim-item:hover, .sim-item.active {
+            background: rgba(0, 242, 254, 0.08);
+            border-color: #00f2fe;
+        }
+        .sim-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .sim-meta { display: flex; justify-content: space-between; font-size: 10px; color: #9ca3af; }
+        /* Main Preview Space Box Layout */
+        #preview-pane { flex: 1; display: flex; flex-direction: column; background: #02040a; }
+        iframe { width: 100%; flex: 1; border: none; background: #000; }
+        #meta-tray {
+            background: #0b1329;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tray-left h2 { font-size: 15px; color: #fff; margin-bottom: 2px; }
+        .tray-left p { font-size: 12px; color: #9ca3af; }
+        .price-badge { background: #10b981; color: #fff; padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <h1>Fluid Engine Suite</h1>
+    <div class="subtitle">Commercial Distribution Inventory</div>
+
+    <div class="filter-group">
+        <button class="filter-btn active" onclick="filterCatalog('all')">All</button>
+        <button class="filter-btn" onclick="filterCatalog('3d')">3D Grid</button>
+        <button class="filter-btn" onclick="filterCatalog('2d')">2D Canvas</button>
+    </div>
+
+    <div class="item-list" id="catalog-container">
+        <!-- Items are injected here via javascript arrays -->
+    </div>
+</div>
+
+<div id="preview-pane">
+    <iframe id="stage" src=""></iframe>
+    <div id="meta-tray">
+        <div class="tray-left">
+            <h2 id="display-title">Select a Simulation</h2>
+            <p id="display-desc">Click an asset variant on the left panel to execute real-time canvas runtime maps.</p>
+        </div>
+        <div class="price-badge" id="display-price">\$0.00 USD</div>
+    </div>
+</div>
+
+<script>
+    // Storefront configuration database values array
+    const simulations = [
+        {
+            id: "3d-wireframe-pool",
+            title: "3D Kinetic Wireframe Heightfield Pool",
+            desc: "Heightfield calculation engine utilizing perspective projection matrices for deep fluid mesh displacement maps.",
+            type: "3d",
+            price: "\$1.99 USD",
+            path: "src/3d-kinetic-wireframe-pool/index.html"
+        },
+        {
+            id: "matrix-ripple",
+            title: "The Matrix Rain Drop Engine",
+            desc: "Top-down 2D canvas discrete fluid wave modeling utilizing fast binary bit-shifting performance arrays.",
+            type: "2d",
+            price: "\$1.49 USD",
+            path: "src/matrix-ripple-engine/index.html"
+        }
+    ];
+
+    function initCatalog() {
+        const container = document.getElementById('catalog-container');
+        container.innerHTML = '';
+        simulations.forEach((sim, idx) => {
+            const item = document.createElement('button');
+            item.className = `sim-item ${idx === 0 ? 'active' : ''}`;
+            item.setAttribute('data-type', sim.type);
+            item.onclick = () => loadSimulation(sim, item);
+            item.innerHTML = `
+                <div class="sim-title">${sim.title}</div>
+                <div class="sim-meta"><span>Type: ${sim.type.toUpperCase()}</span><span>MSRP: ${sim.price}</span></div>
+            `;
+            container.appendChild(item);
+        });
+        if(simulations.length > 0) loadSimulation(simulations[0], container.firstChild);
+    }
+
+    function loadSimulation(sim, element) {
+        document.querySelectorAll('.sim-item').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('stage').src = sim.path;
+        document.getElementById('display-title').textContent = sim.title;
+        document.getElementById('display-desc').textContent = sim.desc;
+        document.getElementById('display-price').textContent = sim.price;
+    }
+
+    function filterCatalog(type) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        document.querySelectorAll('.sim-item').forEach(item => {
+            if(type === 'all' || item.getAttribute('data-type') === type) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    window.onload = initCatalog;
+</script>
+</body>
+</html>

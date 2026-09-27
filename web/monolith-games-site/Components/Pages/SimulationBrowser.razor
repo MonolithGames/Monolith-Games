@@ -1,0 +1,137 @@
+@page "/simulations"
+@page "/tools/simulation-browser"
+
+<PageTitle>Enterprise Simulation Browser / Monolith Platform</PageTitle>
+
+<div class="bg-black text-white min-h-screen flex flex-col font-sans selection:bg-amber-400 selection:text-black">
+
+    <!-- Enterprise Top Navigation Bar -->
+    <header class="bg-neutral-950 border-b border-neutral-900 px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-neutral-900 border border-neutral-800 rounded-xl">
+                <span class="text-xl">🌊</span>
+            </div>
+            <div>
+                <div class="text-xs font-mono uppercase tracking-wider text-amber-400">MONOLITH ENTERPRISE // SIMULATION BROWSER</div>
+                <h1 class="text-lg font-bold text-white leading-none">Interactive Procedural VFX Suite</h1>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a href="/" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white px-4 py-2 rounded-xl text-xs font-mono transition">
+                &larr; Main Console
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Split-Screen Workspace -->
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+
+        <!-- Sidebar Catalog Navigation -->
+        <aside class="w-full md:w-96 bg-neutral-950 border-r border-neutral-900 flex flex-col h-auto md:h-full">
+            <div class="p-4 border-b border-neutral-900 space-y-3">
+                <input type="text" @bind="searchQuery" @bind:event="oninput" placeholder="Search 75+ simulations..."
+                       class="w-full bg-black border border-neutral-800 focus:border-amber-400 text-xs text-white rounded-lg px-3 py-2 outline-none font-mono" />
+
+                <div class="flex gap-2 text-xs font-mono">
+                    <button class="px-3 py-1 rounded-md transition @(selectedCategory == "all" ? "bg-amber-400 text-black font-semibold" : "bg-neutral-900 text-neutral-400 hover:bg-neutral-800")"
+                            @onclick='() => selectedCategory = "all"'>All</button>
+                    <button class="px-3 py-1 rounded-md transition @(selectedCategory == "3d" ? "bg-amber-400 text-black font-semibold" : "bg-neutral-900 text-neutral-400 hover:bg-neutral-800")"
+                            @onclick='() => selectedCategory = "3d"'>3D</button>
+                    <button class="px-3 py-1 rounded-md transition @(selectedCategory == "2d" ? "bg-amber-400 text-black font-semibold" : "bg-neutral-900 text-neutral-400 hover:bg-neutral-800")"
+                            @onclick='() => selectedCategory = "2d"'>2D</button>
+                </div>
+            </div>
+
+            <!-- Simulation List -->
+            <div class="flex-1 overflow-y-auto p-3 space-y-2">
+                @foreach (var sim in FilteredSimulations)
+                {
+                    <div class="p-3 rounded-xl border transition cursor-pointer @(activeSim.Id == sim.Id ? "bg-neutral-900 border-amber-400/80 shadow-lg" : "bg-black/50 border-neutral-900 hover:border-neutral-800")"
+                         @onclick="() => SelectSim(sim)">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="text-xs font-bold text-white">@sim.Title</h3>
+                            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-1.5 py-0.5 rounded">@sim.Msrp</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[10px] font-mono text-neutral-400">
+                            <span>Category: @sim.Category</span>
+                            <span class="text-amber-400">@sim.Type.ToUpper()</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </aside>
+
+        <!-- Main Real-time Simulation Viewport Stage -->
+        <main class="flex-1 flex flex-col bg-black min-h-[500px]">
+            <div class="flex-1 relative bg-black border-b border-neutral-900">
+                <iframe src="@activeSim.UrlPath" class="w-full h-full border-none absolute inset-0"></iframe>
+            </div>
+
+            <!-- Simulation Details Tray -->
+            <div class="p-6 bg-neutral-950 flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <div class="text-xs font-mono text-amber-400 mb-1">ID: @activeSim.Id // @activeSim.Category</div>
+                    <h2 class="text-xl font-bold text-white">@activeSim.Title</h2>
+                    <p class="text-xs text-neutral-400 max-w-2xl mt-1">@activeSim.Description</p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="text-[10px] font-mono text-neutral-400 uppercase">MSRP LICENSE</div>
+                        <div class="text-lg font-bold font-mono text-emerald-400">@activeSim.Msrp</div>
+                    </div>
+                    <a href="/download/simulation_@activeSim.Id" class="bg-white hover:bg-amber-400 text-black font-semibold px-5 py-2.5 rounded-xl text-xs font-mono transition">
+                        Export Bundle
+                    </a>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+</div>
+
+@code {
+    private sealed record SimItem(string Id, string Title, string Category, string Description, string Type, string Msrp, string UrlPath);
+
+    private string searchQuery = "";
+    private string selectedCategory = "all";
+
+    private List<SimItem> simulations = new()
+    {
+        new SimItem("neon-cyberpunk-grid", "The Neon Cyberpunk Grid Grid-Wave", "3D Synthwave Mesh", "A neon-infused perspective mesh that mimics an 80s retro-futuristic synthwave sea using an accelerated dual-axis distortion grid.", "3d", "$1.49 USD", "/simulations/water/The Neon Cyberpunk Grid Grid-Wave/index.html"),
+        new SimItem("vector-blob-metaball", "The Vector Blob Metaball Fluid", "2D Physics Liquid", "A 2D physics simulation utilizing screen-space blurring to force individual floating circles to chemically snap together like real liquid mercury drops.", "2d", "$2.99 USD", "/simulations/water/The Vector Blob Metaball Fluid/index.html"),
+        new SimItem("ascii-waterfall-matrix", "The Generative ASCII Waterfall Matrix", "ASCII Matrix Stream", "A vertical digital rain simulation that drops custom typography characters down the screen, warping speed whenever hitting invisible mathematical river banks.", "2d", "$0.99 USD", "/simulations/water/The Generative ASCII Waterfall Matrix/index.html"),
+        new SimItem("steerable-particle-trails", "Vector Steerable Fluid Particle Trails", "Vector Flowfield", "An interactive canvas particle simulation where hundreds of micro-dots flow along a grid of moving vector currents calculated via multi-layered trigonometric oscillators.", "2d", "$1.99 USD", "/simulations/water/Vector Steerable Fluid Particle Trails/index.html"),
+        new SimItem("rippling-photo-canvas", "Interactive SVG-Filter Rippling Photo Canvas", "SVG Displacement", "Couples dynamic canvas elements directly to inline SVG displacement filters, transforming standard background images into interactive rippling pools.", "2d", "$3.49 USD", "/simulations/water/Interactive SVG-Filter Rippling Photo Canvas/index.html"),
+        new SimItem("kinetic-wireframe-pool", "The 3D Kinetic Wireframe Heightfield Pool", "3D Heightfield Matrix", "Heightfield calculation engine utilizing perspective projection matrices for deep fluid mesh displacement maps.", "3d", "$1.99 USD", "/simulations/water/The 3D Kinetic Wireframe Heightfield Pool/index.html"),
+        new SimItem("pixel-stream", "The Retro 8-Bit Pixel Stream", "Pixel Art Waterfall", "Automated pixelated waterfall generating individual square droplets that stack, slide, and pool together using cellular automata.", "2d", "$0.99 USD", "/simulations/water/The Retro 8-Bit Pixel Stream/index.html"),
+        new SimItem("caustic-light-waves", "The Caustic Light Wave Wallpaper", "Subsurface Caustics", "Mimics bright, shimmering geometric light patterns found at the bottom of swimming pools using layered cosine evaluations.", "2d", "$1.99 USD", "/simulations/water/The Caustic Light Wave Wallpaper/index.html"),
+        new SimItem("window-rain", "Vector Raindrops on a Window Screen", "Ambient Particle Glass", "Spawns physical water droplets running down a dark structural viewport window. Ideal for lo-fi relaxation backdrops.", "2d", "$2.49 USD", "/simulations/water/Vector Raindrops on a Window Screen/index.html"),
+        new SimItem("audio-ocean", "High-Frequency Vector Audio-Responsive Ocean", "Audio-Reactive Wave", "Multi-layered wave engine optimized to receive device microphone frequencies or file streaming metrics to translate volume spikes into mathematical wave height variables.", "2d", "$3.99 USD", "/simulations/water/High-Frequency Vector Audio-Responsive Ocean/index.html"),
+        new SimItem("hydro-elastic-ribbons", "Interactive Hydro-Elastic Ribbons", "Fluid Vector Ribbons", "A network of fine horizontal curtains that twist, snap back, and ripple elegantly across dynamic coordinate curves whenever intercepted by user mouse actions.", "2d", "$1.99 USD", "/simulations/water/Interactive Hydro-Elastic Ribbons/index.html"),
+        new SimItem("ascii-dynamic-swell", "Multi-Layer ASCII Dynamic Swell", "ASCII Terminal Sea", "An advanced console/terminal array layout that layers distinct text characters into cascading parametric waves to build an organic typography deep-ocean scene.", "2d", "$0.99 USD", "/simulations/water/Multi-Layer ASCII Dynamic Swell/index.html"),
+        new SimItem("flowfield-foam-generator", "The Vector Flowfield Foam Generator", "Hydrodynamic Foam", "A 2D particle fluid animation tracking micro-foam dots drifting along a complex grid of moving vectors, simulating breaking surface foam or swirling coastal tides.", "2d", "$1.99 USD", "/simulations/water/The Vector Flowfield Foam Generator/index.html"),
+        new SimItem("concentric-interference-matrix", "The Concentric Interference Wave Matrix", "Geometric Interference", "An automated visual grid that utilizes coordinate distances to cast crisp, perfect geometric interference lines across dark vector spaces.", "2d", "$1.29 USD", "/simulations/water/The Concentric Interference Wave Matrix/index.html"),
+        new SimItem("topographical-marine-scan", "The 3D Topographical Scan Ocean", "3D Topographic Mesh", "A complex rendering that mimics scanning sub-surface marine floor metrics using a dynamically rising isometric math grid.", "3d", "$2.49 USD", "/simulations/water/The 3D Topographical Scan Ocean/index.html")
+    };
+
+    private SimItem activeSim = default!;
+
+    protected override void OnInitialized()
+    {
+        activeSim = simulations.First();
+    }
+
+    private IEnumerable<SimItem> FilteredSimulations => simulations
+        .Where(s => selectedCategory == "all" || s.Type == selectedCategory)
+        .Where(s => string.IsNullOrWhiteSpace(searchQuery) ||
+                    s.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    s.Category.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+
+    private void SelectSim(SimItem sim)
+    {
+        activeSim = sim;
+    }
+}

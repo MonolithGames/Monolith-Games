@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; background: #030a16; overflow: hidden; }
+        canvas { width: 100vw; height: 100vh; display: block; }
+    </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    let time = 0;
+    function draw() {
+        ctx.clearRect(0,0,w,h);
+        time += 0.02;
+        let rows = 25, cols = 25, spacing = 30;
+        let startX = w/2, startY = h/3;
+
+        for(let r=0; r<rows; r++) {
+            for(let c=0; c<cols; c++) {
+                // Isometric projection math
+                let x = (c - cols/2) * spacing;
+                let y = (r - rows/2) * spacing;
+
+                // Wave formula (叠加正弦波)
+                let z = Math.sin(c*0.3 + time) * 15 + Math.cos(r*0.4 + time*1.5) * 15;
+
+                let isoX = startX + (x - y) * Math.cos(Math.PI/6);
+                let isoY = startY + (x + y) * Math.sin(Math.PI/6) - z;
+
+                ctx.fillStyle = `rgba(0, ${120 + z*4}, ${200 + z*3}, ${0.1 + (r/rows)*0.8})`;
+                ctx.beginPath();
+                ctx.arc(isoX, isoY, Math.max(1, 4 + z*0.1), 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+        requestAnimationFrame(draw);
+    }
+    draw();
+</script>
+</body>
+</html>

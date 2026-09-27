@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; background: #111; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { image-rendering: pixelated; border: 4px solid #333; }
+    </style>
+</head>
+<body>
+<canvas id="pixelWater"></canvas>
+<script>
+    const canvas = document.getElementById('pixelWater');
+    const ctx = canvas.getContext('2d');
+    const CELL_SIZE = 8;
+    const COLS = 60, ROWS = 60;
+    canvas.width = COLS * CELL_SIZE; canvas.height = ROWS * CELL_SIZE;
+
+    let grid = Array(COLS).fill(0).map(() => Array(ROWS).fill(0));
+
+    function update() {
+        // Generate source water at the top center
+        for(let x = 27; x <= 33; x++) { if(Math.random() < 0.5) grid[x][0] = 1; }
+
+        // Physics processing from bottom to top
+        for (let y = ROWS - 2; y >= 0; y--) {
+            for (let x = 0; x < COLS; x++) {
+                if (grid[x][y] === 1) {
+                    if (grid[x][y+1] === 0) {
+                        grid[x][y+1] = 1; grid[x][y] = 0;
+                    } else if (x > 0 && grid[x-1][y+1] === 0) {
+                        grid[x-1][y+1] = 1; grid[x][y] = 0;
+                    } else if (x < COLS - 1 && grid[x+1][y+1] === 0) {
+                        grid[x+1][y+1] = 1; grid[x][y] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    function draw() {
+        ctx.fillStyle = '#0f141d'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        for(let x=0; x<COLS; x++) {
+            for(let y=0; y<ROWS; y++) {
+                if(grid[x][y] === 1) {
+                    ctx.fillStyle = `hsl(200, 85%, ${50 + (y*0.5)}%)`;
+                    ctx.fillRect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE-1, CELL_SIZE-1);
+                }
+            }
+        }
+    }
+
+    setInterval(() => { update(); draw(); }, 30);
+</script>
+</body>
+</html>

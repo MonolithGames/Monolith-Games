@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>body { margin: 0; overflow: hidden; background: #000; }</style>
+</head>
+<body>
+<canvas id="caustics"></canvas>
+<script>
+    const canvas = document.getElementById('caustics');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+    let t = 0;
+
+    function render() {
+        t += 0.03;
+        ctx.fillStyle = '#02162e'; ctx.fillRect(0,0,w,h);
+        ctx.lineWidth = 2;
+
+        // Draw overlapping network grids to simulate focused light beams
+        for(let i = 0; i < w; i += 40) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(140, 230, 255, ${0.07 + Math.sin(t)*0.03})`;
+            for(let j = 0; j <= h; j += 20) {
+                let xOffset = Math.sin(j * 0.01 + t + i) * 25;
+                ctx.lineTo(i + xOffset, j);
+            }
+            ctx.stroke();
+        }
+        requestAnimationFrame(render);
+    }
+    window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+    render();
+</script>
+</body>
+</html>

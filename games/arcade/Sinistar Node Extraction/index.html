@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sinistar Node Extraction</title>
+    <style>
+        body { background: #000; color: #e11d48; text-align: center; font-family: monospace; }
+        canvas { background: #030712; display: block; margin: 10px auto; border: 3px solid #e11d48; }
+    </style>
+</head>
+<body>
+<h1>Sinistar Node Extraction™</h1>
+<p>Extract resource fragments before the zone boss expands to capacity! Evade with your <b>Arrow Keys</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let miner = { x: 200, y: 300 }, boss = { x: 200, y: 100, radius: 15 }, zones = [];
+
+    for (let i = 0; i < 5; i++) zones.push({ x: Math.random()*360 + 20, y: Math.random()*260 + 100 });
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') miner.x = Math.max(10, miner.x - 12); if (e.key === 'ArrowRight') miner.x = Math.min(380, miner.x + 12);
+        if (e.key === 'ArrowUp') miner.y = Math.max(10, miner.y - 12); if (e.key === 'ArrowDown') miner.y = Math.min(380, miner.y + 12);
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        boss.radius += 0.03; // Constant scaling growth threat
+
+        let angle = Math.atan2(miner.y - boss.y, miner.x - boss.x);
+        boss.x += Math.cos(angle) * 0.8; boss.y += Math.sin(angle) * 0.8;
+
+        ctx.fillStyle = '#e11d48'; ctx.beginPath(); ctx.arc(boss.x, boss.y, boss.radius, 0, Math.PI*2); ctx.fill(); // Threat Center
+        ctx.fillStyle = '#65a30d'; ctx.fillRect(miner.x, miner.y, 16, 16); // Extraction Unit
+
+        ctx.fillStyle = '#fbbf24';
+        for (let z = zones.length - 1; z >= 0; z--) {
+            ctx.fillRect(zones[z].x, zones[z].y, 10, 10);
+            if (Math.hypot(miner.x - zones[z].x, miner.y - zones[z].y) < 16) { zones.splice(z, 1); boss.radius = Math.max(10, boss.radius - 6); }
+        }
+
+        if (Math.hypot(miner.x - boss.x, miner.y - boss.y) < boss.radius) { alert('System Overrun! Node Severed.'); location.reload(); }
+        if (zones.length === 0 || boss.radius > 90) { alert(zones.length === 0 ? 'Extraction Terminated Successfully!' : 'Target Node Expanded Exorbitantly.'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

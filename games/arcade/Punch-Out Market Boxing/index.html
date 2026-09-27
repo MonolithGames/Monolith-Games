@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Punch-Out Market Boxing</title>
+    <style>
+        body { background: #0f172a; color: #38bdf8; text-align: center; font-family: sans-serif; }
+        canvas { background: #0284c7; display: block; margin: 10px auto; border: 3px solid #38bdf8; }
+    </style>
+</head>
+<body>
+<h1>Punch-Out Market Boxing™</h1>
+<p>Dodge the champion's incoming metrics with <b>Arrow Left</b>, counter-punch with <b>Spacebar</b>!</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let player = { state: 'idle', timer: 0 }, boss = { state: 'idle', timer: 60, hp: 100 }, playerHp = 100;
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && player.state === 'idle') { player.state = 'dodge'; player.timer = 15; }
+        if ((e.key === ' ' || e.key === 'Spacebar') && player.state === 'idle') {
+            player.state = 'punch'; player.timer = 10;
+            if (boss.state === 'windup') { boss.hp -= 20; boss.state = 'idle'; boss.timer = 40; }
+        }
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        if (player.timer > 0 && --player.timer === 0) player.state = 'idle';
+
+        if (--boss.timer <= 0) {
+            if (boss.state === 'idle') { boss.state = 'windup'; boss.timer = 25; }
+            else if (boss.state === 'windup') {
+                boss.state = 'attack'; boss.timer = 10;
+                if (player.state !== 'dodge') playerHp -= 25;
+            } else { boss.state = 'idle'; boss.timer = Math.floor(Math.random()*40 + 30); }
+        }
+
+        ctx.fillStyle = boss.state === 'windup' ? '#ef4444' : '#1e293b'; ctx.fillRect(160, 100, 80, 100); // Enemy Box
+        ctx.fillStyle = player.state === 'dodge' ? '#22c55e' : '#f43f5e'; ctx.fillRect(player.state === 'dodge' ? 100 : 175, 260, 50, 80); // Player Unit
+
+        ctx.font = '14px sans-serif'; ctx.fillStyle = '#fff';
+        ctx.fillText('Corporate Market Share Health: ' + playerHp + '%', 20, 30);
+        ctx.fillText('Monopoly Domain Capital: ' + boss.hp, 240, 30);
+
+        if (playerHp <= 0) { alert('Bankruptcy Finalized.'); location.reload(); }
+        if (boss.hp <= 0) { alert('Regulatory Victory! Monopoly Broken.'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

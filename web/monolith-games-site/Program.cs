@@ -117,6 +117,21 @@ app.UseAuthorization();
 app.UseRateLimiter();
 app.UseAntiforgery();
 
+var simPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "tools", "simulations"));
+if (Directory.Exists(simPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(simPath),
+        RequestPath = "/simulations"
+    });
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(simPath),
+        RequestPath = "/tools/simulations"
+    });
+}
+
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

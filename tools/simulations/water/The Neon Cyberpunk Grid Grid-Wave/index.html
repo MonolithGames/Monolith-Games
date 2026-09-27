@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>body { margin: 0; background: #000; overflow: hidden; }</style>
+</head>
+<body>
+    <canvas id="synthsea"></canvas>
+    <script>
+        const canvas = document.getElementById('synthsea');
+        const ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+        let offset = 0;
+
+        function draw() {
+            ctx.fillStyle = '#05000a'; ctx.fillRect(0,0,w,h);
+            offset += 0.05;
+            ctx.lineWidth = 1.5;
+
+            let horizon = h * 0.4;
+            let lines = 24;
+
+            // Draw Perspective Lines
+            for(let i = -10; i <= lines + 10; i++) {
+                let xStart = (w / lines) * i;
+                ctx.strokeStyle = `rgba(255, 0, 128, 0.4)`;
+                ctx.beginPath();
+                ctx.moveTo(xStart, horizon);
+                ctx.lineTo((xStart - w/2) * 4 + w/2, h);
+                ctx.stroke();
+            }
+
+            // Draw Horizontal Wave Lines
+            for(let j = 0; j < 20; j++) {
+                let ratio = j / 20;
+                let y = horizon + (h - horizon) * Math.pow(ratio, 2); // Exponential depth
+                let waveZ = Math.sin(j * 0.5 - offset) * 15 * ratio;
+
+                ctx.strokeStyle = `rgba(0, 242, 254, ${ratio})`;
+                ctx.beginPath();
+                ctx.moveTo(0, y + waveZ);
+                ctx.lineTo(w, y + waveZ);
+                ctx.stroke();
+            }
+            requestAnimationFrame(draw);
+        }
+        window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+        draw();
+    </script>
+</body>
+</html>

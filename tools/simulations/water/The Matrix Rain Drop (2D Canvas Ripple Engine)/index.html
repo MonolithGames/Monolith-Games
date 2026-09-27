@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { background: #020813; cursor: crosshair; }
+    </style>
+</head>
+<body>
+<canvas id="water"></canvas>
+<script>
+    const canvas = document.getElementById('water');
+    const ctx = canvas.getContext('2d');
+    const width = 200, height = 200;
+    canvas.width = width; canvas.height = height;
+    canvas.style.width = '600px'; canvas.style.height = '600px';
+
+    let r1 = new Int32Array(width * height), r2 = new Int32Array(width * height);
+
+    function drop(x, y, r) {
+        if (x < 1 || x >= width - 1 || y < 1 || y >= height - 1) return;
+        r1[x + y * width] = r;
+    }
+
+    function step() {
+        let img = ctx.createImageData(width, height);
+        let d = img.data;
+        for (let y = 1; y < height - 1; y++) {
+            for (let x = 1; x < width - 1; x++) {
+                let i = x + y * width;
+                r2[i] = ((r1[i-1] + r1[i+1] + r1[i-width] + r1[i+width]) >> 1) - r2[i];
+                r2[i] -= r2[i] >> 5; // Damping
+
+                let val = r2[i];
+                let idx = i << 2;
+                d[idx] = 10 + (val >> 2);     // R
+                d[idx+1] = 70 + (val >> 1);   // G
+                d[idx+2] = 140 + val;         // B
+                d[idx+3] = 255;               // A
+            }
+        }
+        let temp = r1; r1 = r2; r2 = temp;
+        ctx.putImageData(img, 0, 0);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        drop(Math.floor((e.clientX - rect.left) / 3), Math.floor((e.clientY - rect.top) / 3), 512);
+    });
+    setInterval(() => drop(Math.floor(Math.random()*width), Math.floor(Math.random()*height), 256), 300);
+    function loop() { step(); requestAnimationFrame(loop); }
+    loop();
+</script>
+</body>
+</html>

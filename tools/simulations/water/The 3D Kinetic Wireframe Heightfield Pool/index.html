@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Interactive Water Simulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050e14;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        #instructions {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 20px;
+            pointer-events: none;
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 1px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div id="instructions">Click or drag on the mesh to create ripples</div>
+<canvas id="canvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Handle resizing
+    function resize() {
+        canvas.width = window.innerWidth * window.devicePixelRatio;
+        canvas.height = window.innerHeight * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Simulation parameters
+    const COLS = 45;
+    const ROWS = 45;
+    const DAMPING = 0.98;
+
+    // Create height maps for wave simulation
+    let current = Array(COLS).fill(0).map(() => Array(ROWS).fill(0));
+    let previous = Array(COLS).fill(0).map(() => Array(ROWS).fill(0));
+
+    // Camera / Rotation parameters
+    let angle = 0;
+    const speed = 0.003;
+
+    // Interaction coordinates
+    let mouseX = 0;
+    let mouseY = 0;
+    let isMouseDown = false;
+
+    // Core heightfield ripple algorithm
+    function updateWaves() {
+        for (let i = 1; i < COLS - 1; i++) {
+            for (let j = 1; j < ROWS - 1; j++) {
+                current[i][j] = (
+                    previous[i - 1][j] +
+                    previous[i + 1][j] +
+                    previous[i][j - 1] +
+                    previous[i][j + 1]
+                ) / 2 - current[i][j];
+
+                current[i][j] *= DAMPING;
+            }
+        }
+
+        // Swap buffers
+        let temp = previous;
+        previous = current;
+        current = temp;
+    }
+
+    // Cause a ripple at a grid position
+    function splash(gridX, gridY, depth) {
+        if (gridX > 0 && gridX < COLS - 1 && gridY > 0 && gridY < ROWS - 1) {
+            previous[gridX][gridY] = depth;
+            previous[gridX+1][gridY] = depth/2;
+            previous[gridX-1][gridY] = depth/2;
+            previous[gridX][gridY+1] = depth/2;
+            previous[gridX][gridY-1] = depth/2;
+        }
+    }
+
+    // Project 3D space to 2D screen coordinates
+    function project(x, y, z, width, height) {
+        // Translate origin to grid center
+        let cx = x - COLS / 2;
+        let cy = y - ROWS / 2;
+
+        // Rotate around the Y/Z axis system
+        let rotX = cx * Math.cos(angle) - cy * Math.sin(angle);
+        let rotY = cx * Math.sin(angle) + cy * Math.cos(angle);
+
+        // Positioning settings for 3D depth
+        let cameraZ = 60;
+        let zoom = Math.min(width, height) * 0.8;
+
+        // Perspective transform matrices calculations
+        let transX = rotX;
+        let transY = rotY * 0.5 - (z * 0.15); // Factor height into view height
+        let transZ = cameraZ + rotY * 0.8;
+
+        return {
+            x: (transX / transZ) * zoom + width / 2,
+            y: (transY / transZ) * zoom + height * 0.55
+        };
+    }
+
+    // Interaction matching canvas point back to nearest grid intersection
+    function handleInteraction(e) {
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+        const rect = canvas.getBoundingClientRect();
+        const mX = e.clientX - rect.left;
+        const mY = e.clientY - rect.top;
+
+        let closestI = -1;
+        let closestJ = -1;
+        let minDist = Infinity;
+
+        // Simple raycast approximation by scanning closest screen space projection
+        for (let i = 0; i < COLS; i++) {
+            for (let j = 0; j < ROWS; j++) {
+                let pt = project(i, j, current[i][j], w, h);
+                let d = Math.hypot(pt.x - mX, pt.y - mY);
+                if (d < minDist) {
+                    minDist = d;
+                    closestI = i;
+                    closestJ = j;
+                }
+            }
+        }
+
+        if (minDist < 40) {
+            splash(closestI, closestJ, -15);
+        }
+    }
+
+    // Event listeners
+    window.addEventListener('mousedown', (e) => { isMouseDown = true; handleInteraction(e); });
+    window.addEventListener('mousemove', (e) => { if (isMouseDown) handleInteraction(e); });
+    window.addEventListener('mouseup', () => isMouseDown = false);
+
+    // Touch supports
+    window.addEventListener('touchstart', (e) => { isMouseDown = true; handleInteraction(e.touches[0]); });
+    window.addEventListener('touchmove', (e) => { if (isMouseDown) handleInteraction(e.touches[0]); });
+    window.addEventListener('touchend', () => isMouseDown = false);
+
+    // Render loop
+    function draw() {
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+
+        ctx.clearRect(0, 0, w, h);
+        angle += speed;
+
+        updateWaves();
+
+        // Render wireframe grid lines
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i < COLS; i++) {
+            for (let j = 0; j < ROWS; j++) {
+
+                // Style lines based dynamically on displacement height
+                let hValue = current[i][j];
+                let blueIntensity = Math.floor(Math.max(100, Math.min(255, 180 + hValue * 15)));
+                let greenIntensity = Math.floor(Math.max(30, Math.min(180, 100 + hValue * 10)));
+                ctx.strokeStyle = `rgba(30, ${greenIntensity}, ${blueIntensity}, 0.45)`;
+
+                let pCurrent = project(i, j, current[i][j], w, h);
+
+                // Draw line to right neighbor
+                if (i < COLS - 1) {
+                    let pRight = project(i + 1, j, current[i + 1][j], w, h);
+                    ctx.beginPath();
+                    ctx.moveTo(pCurrent.x, pCurrent.y);
+                    ctx.lineTo(pRight.x, pRight.y);
+                    ctx.stroke();
+                }
+
+                // Draw line to bottom neighbor
+                if (j < ROWS - 1) {
+                    let pBottom = project(i, j + 1, current[i][j + 1], w, h);
+                    ctx.beginPath();
+                    ctx.moveTo(pCurrent.x, pCurrent.y);
+                    ctx.lineTo(pBottom.x, pBottom.y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    // Initialize with random dropping ripples periodically
+    setInterval(() => {
+        if (!isMouseDown) {
+            let rx = Math.floor(Math.random() * (COLS - 4)) + 2;
+            let ry = Math.floor(Math.random() * (ROWS - 4)) + 2;
+            splash(rx, ry, -8 - Math.random() * 8);
+        }
+    }, 1200);
+
+    // Start loop
+    draw();
+</script>
+</body>
+</html>

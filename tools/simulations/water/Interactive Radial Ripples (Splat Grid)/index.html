@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>body { margin: 0; background: #030712; overflow: hidden; }</style>
+</head>
+<body>
+<canvas id="splat"></canvas>
+<script>
+    const canvas = document.getElementById('splat');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+    let ripples = [];
+
+    window.addEventListener('click', (e) => {
+        ripples.push({ x: e.clientX, y: e.clientY, r: 0, maxR: 150, alpha: 1 });
+    });
+
+    function draw() {
+        ctx.fillStyle = '#030712'; ctx.fillRect(0,0,w,h);
+
+        ripples.forEach((r, idx) => {
+            r.r += 4;
+            r.alpha = 1 - (r.r / r.maxR);
+            if(r.r >= r.maxR) { ripples.splice(idx, 1); return; }
+
+            ctx.strokeStyle = `rgba(0, 191, 255, ${r.alpha})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI*2); ctx.stroke();
+        });
+        requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+    draw();
+</script>
+</body>
+</html>

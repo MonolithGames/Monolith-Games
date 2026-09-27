@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phoenix Dividend Shield</title>
+    <style>
+        body { background: #090514; color: #a855f7; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #a855f7; }
+    </style>
+</head>
+<body>
+<h1>Phoenix Dividend Shield™</h1>
+<p>Eliminate foreign hostiles before they deploy structural payloads. Steer with <b>Arrows</b>, launch with <b>Space</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let ship = { x: 190, y: 350 }, lasers = [], fleet = [], ticks = 0;
+
+    for (let i = 0; i < 4; i++) fleet.push({ x: i * 80 + 40, y: 60, wingSp: 2, size: 22 });
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && ship.x > 10) ship.x -= 15; if (e.key === 'ArrowRight' && ship.x < 370) ship.x += 15;
+        if (e.key === ' ' || e.key === 'Spacebar') lasers.push({ x: ship.x + 8, y: ship.y, w: 4, h: 10 });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#c084fc'; ctx.fillRect(ship.x, ship.y, 20, 15); // Strategic Asset Vessel
+
+        fleet.forEach(f => {
+            f.x += f.wingSp; if (f.x < 20 || f.x > 360) f.wingSp *= -1;
+            if (ticks % 120 === 0 && Math.random() < 0.3) f.y += 25; // Descent deployment
+            ctx.fillStyle = '#f43f5e'; ctx.fillRect(f.x, f.y, f.size, f.size - 6);
+            if (f.y >= ship.y) { alert('Perimeter Fully Broken!'); location.reload(); }
+        });
+
+        ctx.fillStyle = '#22d3ee';
+        for (let l = lasers.length - 1; l >= 0; l--) {
+            lasers[l].y -= 6; ctx.fillRect(lasers[l].x, lasers[l].y, lasers[l].w, lasers[l].h);
+            for (let f = fleet.length - 1; f >= 0; f--) {
+                if (lasers[l] && lasers[l].x > fleet[f].x && lasers[l].x < fleet[f].x + fleet[f].size && lasers[l].y > fleet[f].y && lasers[l].y < fleet[f].y + 16) {
+                    fleet.splice(f, 1); lasers.splice(l, 1); break;
+                }
+            }
+            if (lasers[l] && lasers[l].y < 0) lasers.splice(l, 1);
+        }
+        if (fleet.length === 0) { alert('Asset Ledger Protected!'); location.reload(); }
+        ticks++; requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

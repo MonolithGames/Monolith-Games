@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phoenix Firewall Matrix</title>
+    <style>
+        body { background: #0b001a; color: #ff5500; text-align: center; font-family: monospace; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #ff5500; }
+    </style>
+</head>
+<body>
+<h1>Phoenix Firewall Matrix™</h1>
+<p>Eliminate the heavy mothership sector shield! Steer with <b>Arrow Left/Right</b> and fire with <b>Spacebar</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let ship = { x: 185, y: 350 }, lasers = [], boss = { x: 100, y: 50, w: 200, hp: 5 }, birds = [], ticks = 0;
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && ship.x > 10) ship.x -= 15; if (e.key === 'ArrowRight' && ship.x < 370) ship.x += 15;
+        if (e.key === ' ' || e.key === 'Spacebar') lasers.push({ x: ship.x + 13, y: ship.y });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#00ff55'; ctx.fillRect(ship.x, ship.y, 30, 15);
+
+        boss.x += Math.sin(ticks++ * 0.03) * 2;
+        ctx.fillStyle = '#ff3300'; ctx.fillRect(boss.x, boss.y, boss.w, 25);
+
+        if(ticks % 50 === 0) birds.push({ x: boss.x + Math.random()*boss.w, y: 75, vy: 3 });
+
+        ctx.fillStyle = '#ffaa00';
+        for(let i=birds.length-1; i>=0; i--) {
+            birds[i].y += birds[i].vy; ctx.fillRect(birds[i].x, birds[i].y, 16, 12);
+            if(birds[i].y > 340 && Math.abs(birds[i].x - ship.x) < 25) { alert('Defeated!'); location.reload(); }
+            if(birds[i].y > 400) birds.splice(i, 1);
+        }
+
+        ctx.fillStyle = '#ffffff';
+        for(let l=lasers.length-1; l>=0; l--) {
+            lasers[l].y -= 6; ctx.fillRect(lasers[l].x, lasers[l].y, 4, 10);
+            if(lasers[l].y > boss.y && lasers[l].y < boss.y+25 && lasers[l].x > boss.x && lasers[l].x < boss.x + boss.w) {
+                boss.hp--; lasers.splice(l, 1); boss.w -= 30; if(boss.hp <= 0) { alert('Mothership Disrupted!'); location.reload(); } continue;
+            }
+            if(lasers[l].y < 0) lasers.splice(l, 1);
+        }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

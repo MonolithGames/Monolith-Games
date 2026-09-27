@@ -1,8 +1,11 @@
-This directory is reserved for Cocos (Cocos2d-x / Cocos Creator) projects and assets.
+# Cocos Creator Engine Ecosystem
 
-Usage:
-- Place Cocos project folders here (each project in its own subdirectory).
-- Include engine-specific files, build scripts, and platform exports under each project folder.
-- Add a README per project describing build steps and required SDK/tooling.
+**Founder & Lead Architect**: Mike  
+**Studio**: Monolith Games Inc.  
 
-Do not commit large export artifacts unless necessary; prefer repository references or CI export steps.
+## 🕹️ Architecture
+- **`projects/`**: Active game titles (`roadblock`, `tank-line`, `block-breaker`, `space-shooter`).
+- **`frameworks/`**: Reusable modular frameworks (`tower-defense-framework/`).
+- **`templates/`**: Production starters (`tower-defense`, `match3`, `idle`).
+- **`shared/`**: Shared modules (`ui`, `audio`, `ads`, `saves`).
+- **`docs/`**: Technical guides.

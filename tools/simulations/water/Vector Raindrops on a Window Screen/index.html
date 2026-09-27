@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>body { margin: 0; background: #0a0f1d; overflow: hidden; }</style>
+</head>
+<body>
+<canvas id="rain"></canvas>
+<script>
+    const canvas = document.getElementById('rain');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+    let drops = [];
+
+    function createDrop() {
+        if(drops.length < 80) {
+            drops.push({ x: Math.random()*w, y: -10, r: Math.random()*4 + 2, speed: Math.random()*2 + 1 });
+        }
+    }
+
+    function update() {
+        createDrop();
+        drops.forEach((d, idx) => {
+            d.y += d.speed;
+            d.x += Math.sin(d.y * 0.05) * 0.3; // Gentle wobble down window
+            if(d.y > h) drops.splice(idx, 1);
+        });
+    }
+
+    function draw() {
+        ctx.fillStyle = 'rgba(10, 15, 29, 0.3)'; ctx.fillRect(0, 0, w, h);
+        drops.forEach(d => {
+            let grad = ctx.createRadialGradient(d.x, d.y, 1, d.x, d.y, d.r);
+            grad.addColorStop(0, 'rgba(174, 219, 255, 0.9)');
+            grad.addColorStop(0.8, 'rgba(33, 114, 181, 0.4)');
+            grad.addColorStop(1, 'rgba(10, 15, 29, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI*2); ctx.fill();
+        });
+    }
+
+    function loop() { update(); draw(); requestAnimationFrame(loop); }
+    window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+    loop();
+</script>
+</body>
+</html>

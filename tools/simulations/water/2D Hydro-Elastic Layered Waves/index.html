@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>body { margin: 0; background: #020710; overflow: hidden; }</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+    let waves = [
+        { t: 0, speed: 0.02, amp: 25, freq: 0.005, color: 'rgba(20, 110, 180, 0.4)', y: h * 0.6 },
+        { t: 5, speed: 0.015, amp: 35, freq: 0.003, color: 'rgba(30, 140, 210, 0.3)', y: h * 0.63 },
+        { t: 10, speed: 0.01, amp: 15, freq: 0.008, color: 'rgba(10, 70, 140, 0.6)', y: h * 0.66 }
+    ];
+
+    function animate() {
+        ctx.clearRect(0, 0, w, h);
+        waves.forEach(wave => {
+            wave.t += wave.speed;
+            ctx.fillStyle = wave.color;
+            ctx.beginPath();
+            ctx.moveTo(0, h);
+            for (let x = 0; x <= w; x += 10) {
+                let y = wave.y + Math.sin(x * wave.freq + wave.t) * wave.amp + Math.cos(x * 0.002 + wave.t * 0.5) * 10;
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(w, h);
+            ctx.closePath();
+            ctx.fill();
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
+</body>
+</html>

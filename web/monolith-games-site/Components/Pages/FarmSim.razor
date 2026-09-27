@@ -1,0 +1,299 @@
+@page "/games/farm"
+@page "/farm"
+
+<PageTitle>FarmMonolith / Monolith Games</PageTitle>
+
+<div class="bg-black text-white min-h-screen p-6 md:p-10 font-sans selection:bg-amber-400 selection:text-black">
+
+    <!-- Header -->
+    <header class="mb-8 pb-6 border-b border-neutral-900 flex flex-wrap justify-between items-center gap-4">
+        <div>
+            <div class="text-xs font-mono uppercase tracking-wider text-amber-400 mb-1">🌾 MONOLITH FARMING SIMULATOR // VER 3.0.0</div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">FarmMonolith: Island Agriculture</h1>
+            <p class="text-neutral-400">Manage automated irrigation, harvest artisan crops, raise livestock, and trade on the Monolith Global Market.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="/catalog" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white px-4 py-2 rounded-xl text-xs font-mono transition">
+                &larr; Catalog
+            </a>
+        </div>
+    </header>
+
+    <!-- Top Stats Banner -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div class="bg-neutral-950 border border-neutral-900 p-4 rounded-xl">
+            <div class="text-[10px] font-mono text-neutral-400">TOTAL GOLD</div>
+            <div class="text-2xl font-bold font-mono text-amber-400">$@gold.ToString("N0")</div>
+        </div>
+        <div class="bg-neutral-950 border border-neutral-900 p-4 rounded-xl">
+            <div class="text-[10px] font-mono text-neutral-400">FARM LEVEL</div>
+            <div class="text-2xl font-bold font-mono text-emerald-400">LVL @farmLevel</div>
+        </div>
+        <div class="bg-neutral-950 border border-neutral-900 p-4 rounded-xl">
+            <div class="text-[10px] font-mono text-neutral-400">IRRIGATION WATER</div>
+            <div class="text-2xl font-bold font-mono text-cyan-400">@waterLevel Gallons</div>
+        </div>
+        <div class="bg-neutral-950 border border-neutral-900 p-4 rounded-xl">
+            <div class="text-[10px] font-mono text-neutral-400">SILO CAPACITY</div>
+            <div class="text-2xl font-bold font-mono text-indigo-400">@CurrentStorage / @maxStorage Units</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Interactive Crop Plot Grid (2x3 Grid) -->
+        <div class="lg:col-span-2 space-y-6">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>🌱 ACTIVE CROP PLOTS</span>
+                <span class="text-xs font-mono text-neutral-500">(Click to plant, water, or harvest)</span>
+            </h2>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                @for (int i = 0; i < plots.Count; i++)
+                {
+                    var index = i;
+                    var plot = plots[index];
+                    <div class="bg-neutral-950 border border-neutral-900 hover:border-amber-400/50 p-5 rounded-2xl flex flex-col justify-between h-48 transition shadow-xl relative overflow-hidden">
+
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-mono text-neutral-500">PLOT #@(index + 1)</span>
+                            <span class="text-xs font-mono font-semibold px-2 py-0.5 rounded @(plot.State == PlotState.Empty ? "bg-neutral-900 text-neutral-400" : plot.State == PlotState.Ready ? "bg-emerald-950 text-emerald-400 border border-emerald-800" : "bg-amber-950 text-amber-400 border border-amber-800")">
+                                @plot.State
+                            </span>
+                        </div>
+
+                        <div class="text-center my-2">
+                            <div class="text-4xl mb-2">@plot.EmojiIcon</div>
+                            <div class="font-bold text-sm text-white">@plot.CropName</div>
+                            @if (plot.State == PlotState.Growing)
+                            {
+                                <div class="w-full bg-neutral-900 h-1.5 rounded-full mt-2 overflow-hidden">
+                                    <div class="bg-amber-400 h-full transition-all duration-500" style="width: @plot.GrowthProgress%;"></div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="flex gap-2">
+                            @if (plot.State == PlotState.Empty)
+                            {
+                                <button @onclick="() => PlantCrop(index, SeedType.Wheat)" class="flex-1 bg-neutral-900 hover:bg-neutral-800 text-white text-[10px] font-mono py-1.5 rounded-lg border border-neutral-800 transition">🌾 Wheat</button>
+                                <button @onclick="() => PlantCrop(index, SeedType.Corn)" class="flex-1 bg-neutral-900 hover:bg-neutral-800 text-white text-[10px] font-mono py-1.5 rounded-lg border border-neutral-800 transition">🌽 Corn</button>
+                                <button @onclick="() => PlantCrop(index, SeedType.Pumpkin)" class="flex-1 bg-neutral-900 hover:bg-neutral-800 text-white text-[10px] font-mono py-1.5 rounded-lg border border-neutral-800 transition">🎃 Pumpkin</button>
+                            }
+                            else if (plot.State == PlotState.Growing)
+                            {
+                                <button @onclick="() => WaterPlot(index)" class="w-full bg-cyan-950 hover:bg-cyan-900 text-cyan-400 text-xs font-mono py-1.5 rounded-lg border border-cyan-800 transition">
+                                    💧 Water Crop (+25%)
+                                </button>
+                            }
+                            else if (plot.State == PlotState.Ready)
+                            {
+                                <button @onclick="() => HarvestPlot(index)" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs font-mono py-1.5 rounded-lg transition">
+                                    🧺 Harvest Crop
+                                </button>
+                            }
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Barn, Silo & Global Market Section -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>🏪 GLOBAL FARM MARKET</span>
+            </h2>
+
+            <!-- Barn Silo Storage -->
+            <div class="bg-neutral-950 border border-neutral-900 p-5 rounded-2xl space-y-4">
+                <h3 class="text-xs font-mono uppercase tracking-wider text-amber-400">HARVEST SILO STORAGE</h3>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-neutral-900">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🌾</span>
+                            <div>
+                                <div class="text-xs font-bold text-white">Golden Wheat</div>
+                                <div class="text-[10px] text-neutral-400 font-mono">$15 / unit</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-mono font-bold text-white">@wheatCount Units</span>
+                            <button @onclick="() => SellCrop(SeedType.Wheat)" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg text-xs font-mono transition">Sell</button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-neutral-900">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🌽</span>
+                            <div>
+                                <div class="text-xs font-bold text-white">Sweet Corn</div>
+                                <div class="text-[10px] text-neutral-400 font-mono">$35 / unit</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-mono font-bold text-white">@cornCount Units</span>
+                            <button @onclick="() => SellCrop(SeedType.Corn)" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg text-xs font-mono transition">Sell</button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-neutral-900">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🎃</span>
+                            <div>
+                                <div class="text-xs font-bold text-white">Giant Pumpkin</div>
+                                <div class="text-[10px] text-neutral-400 font-mono">$85 / unit</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-mono font-bold text-white">@pumpkinCount Units</span>
+                            <button @onclick="() => SellCrop(SeedType.Pumpkin)" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg text-xs font-mono transition">Sell</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upgrades & Automation -->
+            <div class="bg-neutral-950 border border-neutral-900 p-5 rounded-2xl space-y-4">
+                <h3 class="text-xs font-mono uppercase tracking-wider text-amber-400">FARM UPGRADES & AUTOMATION</h3>
+
+                <button @onclick="UpgradeSilo" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 p-3 rounded-xl flex justify-between items-center text-xs font-mono transition">
+                    <div>
+                        <div class="font-bold text-white text-left">Expand Silo Storage (+50 Cap)</div>
+                        <div class="text-neutral-400 text-left text-[10px]">Cost: $500</div>
+                    </div>
+                    <span class="text-amber-400 font-bold">Upgrade</span>
+                </button>
+
+                <button @onclick="RefillWater" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 p-3 rounded-xl flex justify-between items-center text-xs font-mono transition">
+                    <div>
+                        <div class="font-bold text-white text-left">Refill Water Reservoir (+100 Gal)</div>
+                        <div class="text-neutral-400 text-left text-[10px]">Cost: $100</div>
+                    </div>
+                    <span class="text-cyan-400 font-bold">Refill</span>
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    public enum PlotState { Empty, Growing, Ready }
+    public enum SeedType { None, Wheat, Corn, Pumpkin }
+
+    public class FarmPlot
+    {
+        public PlotState State { get; set; } = PlotState.Empty;
+        public SeedType Crop { get; set; } = SeedType.None;
+        public int GrowthProgress { get; set; } = 0;
+
+        public string CropName => Crop switch
+        {
+            SeedType.Wheat => "Golden Wheat",
+            SeedType.Corn => "Sweet Corn",
+            SeedType.Pumpkin => "Giant Pumpkin",
+            _ => "Empty Soil"
+        };
+
+        public string EmojiIcon => State switch
+        {
+            PlotState.Empty => "🟫",
+            PlotState.Ready => Crop switch { SeedType.Wheat => "🌾", SeedType.Corn => "🌽", SeedType.Pumpkin => "🎃", _ => "🌱" },
+            _ => "🌱"
+        };
+    }
+
+    private int gold = 1500;
+    private int farmLevel = 1;
+    private int waterLevel = 100;
+    private int maxStorage = 100;
+
+    private int wheatCount = 10;
+    private int cornCount = 5;
+    private int pumpkinCount = 2;
+
+    private int CurrentStorage => wheatCount + cornCount + pumpkinCount;
+
+    private List<FarmPlot> plots = new()
+    {
+        new FarmPlot(), new FarmPlot(), new FarmPlot(),
+        new FarmPlot(), new FarmPlot(), new FarmPlot()
+    };
+
+    private void PlantCrop(int index, SeedType seed)
+    {
+        var plot = plots[index];
+        plot.Crop = seed;
+        plot.State = PlotState.Growing;
+        plot.GrowthProgress = 10;
+    }
+
+    private void WaterPlot(int index)
+    {
+        if (waterLevel <= 0) return;
+        waterLevel -= 10;
+        var plot = plots[index];
+        plot.GrowthProgress += 30;
+        if (plot.GrowthProgress >= 100)
+        {
+            plot.GrowthProgress = 100;
+            plot.State = PlotState.Ready;
+        }
+    }
+
+    private void HarvestPlot(int index)
+    {
+        var plot = plots[index];
+        if (CurrentStorage >= maxStorage) return;
+
+        switch (plot.Crop)
+        {
+            case SeedType.Wheat: wheatCount += 5; break;
+            case SeedType.Corn: cornCount += 3; break;
+            case SeedType.Pumpkin: pumpkinCount += 2; break;
+        }
+
+        plot.State = PlotState.Empty;
+        plot.Crop = SeedType.None;
+        plot.GrowthProgress = 0;
+    }
+
+    private void SellCrop(SeedType type)
+    {
+        switch (type)
+        {
+            case SeedType.Wheat:
+                if (wheatCount > 0) { wheatCount--; gold += 15; }
+                break;
+            case SeedType.Corn:
+                if (cornCount > 0) { cornCount--; gold += 35; }
+                break;
+            case SeedType.Pumpkin:
+                if (pumpkinCount > 0) { pumpkinCount--; gold += 85; }
+                break;
+        }
+    }
+
+    private void UpgradeSilo()
+    {
+        if (gold >= 500)
+        {
+            gold -= 500;
+            maxStorage += 50;
+            farmLevel++;
+        }
+    }
+
+    private void RefillWater()
+    {
+        if (gold >= 100)
+        {
+            gold -= 100;
+            waterLevel += 100;
+        }
+    }
+}

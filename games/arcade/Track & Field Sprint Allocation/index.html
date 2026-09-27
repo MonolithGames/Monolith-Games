@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track & Field Sprint Allocation</title>
+    <style>
+        body { background: #064e3b; color: #10b981; text-align: center; font-family: monospace; }
+        canvas { background: #b91c1c; display: block; margin: 10px auto; border: 4px solid #fff; }
+    </style>
+</head>
+<body>
+<h1>Track & Field Sprint Allocation™</h1>
+<p>Alternately mash the <b>Arrow Left</b> and <b>Arrow Right</b> keys to accelerate through the pipeline!</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let runnerX = 20, rivalX = 20, lastKey = '', speed = 0, rivalSpeed = 1.8, dist = 1000;
+
+    window.addEventListener('keydown', e => {
+        if ((e.key === 'ArrowLeft' && lastKey !== 'L') || (e.key === 'ArrowRight' && lastKey !== 'R')) {
+            speed = Math.min(8, speed + 0.6); lastKey = e.key === 'ArrowLeft' ? 'L' : 'R';
+        }
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+        for(let i=1; i<4; i++) { ctx.beginPath(); ctx.moveTo(0, i*100); ctx.lineTo(400, i*100); ctx.stroke(); } // Lane Markings
+
+        speed = Math.max(0, speed - 0.08); runnerX += speed; rivalX += rivalSpeed + Math.random()*0.3;
+
+        ctx.fillStyle = '#06b6d4'; ctx.fillRect(runnerX % 360, 135, 25, 30); // Player Unit
+        ctx.fillStyle = '#f59e0b'; ctx.fillRect(rivalX % 360, 235, 25, 30); // Corporate Competitor
+
+        ctx.font = '16px monospace'; ctx.fillStyle = '#fff';
+        ctx.fillText('Project Completion Pipeline Progress: ' + Math.floor(runnerX) + ' / ' + dist + 'm', 20, 40);
+
+        if (runnerX >= dist || rivalX >= dist) {
+            alert(runnerX >= rivalX ? 'Contract Won! Allocation Secured.' : 'Contract Lost to Out-Of-State Competitor.');
+            runnerX = 20; rivalX = 20; speed = 0;
+        }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>
