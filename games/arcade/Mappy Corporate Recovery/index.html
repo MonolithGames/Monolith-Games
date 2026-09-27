@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mappy Corporate Recovery</title>
+    <style>
+        body { background: #030a16; color: #ff00aa; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; display: block; margin: 10px auto; border: 3px solid #ff00aa; }
+    </style>
+</head>
+<body>
+<h1>Mappy Corporate Recovery™</h1>
+<p>Bounce on trampolines to reach floors and collect stolen document assets! Move with <b>Arrow Left/Right</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let mouse = { x: 190, y: 80, vy: 0 }, cat = { x: 60, y: 180, dx: 2 }, assets = [], score = 0;
+    const floors =;
+
+    for(let i=0; i<3; i++) { assets.push({x: 60, y: floors[i]-15}, {x: 320, y: floors[i]-15}); }
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && mouse.x > 50) mouse.x -= 15;
+        if (e.key === 'ArrowRight' && mouse.x < 330) mouse.x += 15;
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#555'; floors.forEach(y => { ctx.fillRect(40, y, 120, 6); ctx.fillRect(240, y, 120, 6); });
+        ctx.fillStyle = '#00ffcc'; ctx.fillRect(170, 360, 60, 8); // Trampoline
+
+        mouse.vy += 0.2; mouse.y += mouse.vy;
+        if (mouse.y >= 340 && mouse.x > 160 && mouse.x < 240) { mouse.y = 340; mouse.vy = -7.5; }
+
+        floors.forEach(f => { if(Math.abs(mouse.y - (f-20)) < 5 && mouse.vy > 0 && (mouse.x < 160 || mouse.x > 240)) { mouse.y = f-20; mouse.vy = 0; } });
+
+        cat.x += cat.dx; if(cat.x < 40 || cat.x > 340) cat.dx *= -1;
+        ctx.fillStyle = '#ff0000'; ctx.fillRect(cat.x, cat.y, 16, 20);
+
+        ctx.fillStyle = '#ffff00';
+        for(let i=assets.length-1; i>=0; i--) {
+            ctx.fillRect(assets[i].x, assets[i].y, 12, 12);
+            if(Math.hypot(mouse.x-assets[i].x, mouse.y-assets[i].y) < 18) { assets.splice(i, 1); score += 200; }
+        }
+
+        ctx.fillStyle = '#ff00aa'; ctx.fillRect(mouse.x, mouse.y, 16, 20);
+        if(Math.hypot(mouse.x-cat.x, mouse.y-cat.y) < 15) { alert('Audit Trapped! Score: ' + score); location.reload(); }
+        if(assets.length === 0) { alert('Recovery Complete!'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>

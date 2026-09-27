@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Xevious Matrix Inversion</title>
+    <style>
+        body { background: #0b1329; color: #10b981; text-align: center; font-family: sans-serif; }
+        canvas { background: #020617; display: block; margin: 10px auto; border: 3px solid #10b981; }
+    </style>
+</head>
+<body>
+<h1>Xevious Matrix Inversion™</h1>
+<p>Navigate vertical space, intercept lines, and clear ground servers. Move with <b>Arrows</b>, fire with <b>Space</b>.</p>
+<p><b>MSRP: $4.99 USD</b> (Proprietary Closed-Source License)</p>
+<canvas id="g" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
+    let ship = { x: 190, y: 320 }, projectiles = [], groundNodes = [], ticks = 0;
+
+    for (let i = 0; i < 4; i++) groundNodes.push({ x: Math.random()*360, y: Math.random()*200, r: 14 });
+
+    window.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' && ship.x > 10) ship.x -= 15; if (e.key === 'ArrowRight' && ship.x < 370) ship.x += 15;
+        if (e.key === 'ArrowUp' && ship.y > 100) ship.y -= 15; if (e.key === 'ArrowDown' && ship.y < 360) ship.y += 15;
+        if (e.key === ' ' || e.key === 'Spacebar') projectiles.push({ x: ship.x + 8, y: ship.y, target: false }, { x: ship.x + 8, y: ship.y, target: true });
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillStyle = '#1e293b'; groundNodes.forEach(n => { n.y += 1; if(n.y > 400) { n.y = -20; n.x = Math.random()*360; } ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2); ctx.fill(); });
+
+        ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.moveTo(ship.x+10, ship.y); ctx.lineTo(ship.x, ship.y+25); ctx.lineTo(ship.x+20, ship.y+25); ctx.closePath(); ctx.fill();
+
+        for (let p = projectiles.length - 1; p >= 0; p--) {
+            let pr = projectiles[p]; pr.y -= 5;
+            ctx.fillStyle = pr.target ? '#ff00ff' : '#00ffff'; ctx.fillRect(pr.x-2, pr.y, 4, 8);
+
+            if (pr.target) {
+                groundNodes.forEach((n, ni) => { if(Math.hypot(pr.x - n.x, pr.y - n.y) < n.r) { groundNodes.splice(ni, 1); groundNodes.push({x: Math.random()*360, y: -20, r: 14}); projectiles.splice(p, 1); } });
+            }
+            if (projectiles[p] && pr.y < 0) projectiles.splice(p, 1);
+        }
+        if (groundNodes.some(n => Math.hypot(ship.x+10 - n.x, ship.y+12 - n.y) < n.r)) { alert('Data Collision Overwrite!'); location.reload(); }
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>
