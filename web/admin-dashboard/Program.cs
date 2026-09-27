@@ -2,11 +2,42 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
 app.UseStaticFiles();
+
+// Serve web-arcade static files from the Android folder (android/web-arcade) at request path /web-arcade
+try
+{
+    var arcadePath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "android", "web-arcade"));
+    if (Directory.Exists(arcadePath))
+    {
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(arcadePath),
+            RequestPath = "/web-arcade"
+        });
+    }
+}
+catch { /* ignore if path resolution fails */ }
+
+// Also serve platform-level web-arcade (platform/web-arcade) at /platform/web-arcade
+try
+{
+    var platformArcade = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "platform", "web-arcade"));
+    if (Directory.Exists(platformArcade))
+    {
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(platformArcade),
+            RequestPath = "/platform/web-arcade"
+        });
+    }
+}
+catch { }
 
 string HTML = @"<!DOCTYPE html>
 <html lang=""en"">
@@ -110,6 +141,25 @@ string HTML = @"<!DOCTYPE html>
             </div>
         </section>
     </main>
+    <script>
+        function onGenreChange(v) {
+            if (v === 'match3') {
+                location.href = '/arcade/match3/';
+            } else {
+                // default: stay on store page
+            }
+        }
+
+        function toggleChristmas() {
+            document.body.classList.toggle('christmas');
+            // simple theme change
+            if (document.body.classList.contains('christmas')) {
+                document.body.style.background = '#001f13';
+            } else {
+                document.body.style.background = '#0a0a0a';
+            }
+        }
+    </script>
 </body>
 </html>";
 
@@ -122,7 +172,7 @@ app.MapGet("/download/{game}", (string game, IHostEnvironment env) =>
     [
         Path.Combine(AppContext.BaseDirectory, "wwwroot", "downloads", fileName),
         Path.Combine(env.ContentRootPath, "wwwroot", "downloads", fileName),
-        Path.Combine("C:/Users/auora/StudioProjects/Monolith-Games/src/Monolith.Store/wwwroot/downloads", fileName)
+        Path.Combine(env.ContentRootPath, "..", "..", "src", "Monolith.Store", "wwwroot", "downloads", fileName)
     ];
 
     foreach (var path in candidatePaths)
@@ -134,6 +184,14 @@ app.MapGet("/download/{game}", (string game, IHostEnvironment env) =>
     }
 
     return Results.NotFound($"APK for game '{game}' not found in candidate paths.");
+});
+
+// Serve simple game metadata listing for tower defense
+app.MapGet("/games/tower-defense/metadata.json", (IHostEnvironment env) =>
+{
+    var path = Path.Combine(env.ContentRootPath, "wwwroot", "games", "tower-defense", "metadata.json");
+    if (File.Exists(path)) return Results.File(path, "application/json");
+    return Results.NotFound();
 });
 
 app.Run();

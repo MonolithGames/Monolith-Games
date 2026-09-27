@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Run Gradle build if wrapper exists
+      shell: bash
+      run: |
+        if [ -f "./gradlew" ] || [ -f "./Monolith-Games/gradlew" ]; then
+          echo "Gradle wrapper found, running build..."
+          chmod +x ./gradlew || true
+          ./gradlew assemble --no-daemon || exit 1
+        else
+          echo "No gradlew found at repo root; attempting to locate gradlew in subprojects..."
+          found=$(find . -maxdepth 3 -name gradlew | head -n 1)
+          if [ -n "$found" ]; then
+            echo "Found gradlew at $found"
+            chmod +x "$found"
+            "$found" assemble --no-daemon || exit 1
+          else
+            echo "No gradlew wrapper found; skipping Gradle build."
+          fi
+        fi

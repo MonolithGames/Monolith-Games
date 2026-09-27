@@ -94,3 +94,32 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Android / Gradle / Android Studio
+/.gradle/
+/.idea/
+/.idea/*
+*.iml
+/local.properties
+/captures/
+/.cxx/
+*.apk
+*.ap_
+*.aab
+
+# Visual Studio
+/.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Node
+node_modules/
+
+# Keep README and license
+!README.md
+!LICENSE

@@ -5,8 +5,8 @@
 void GetSyncedBalanceText(TCHAR *outBuffer, int maxLen) {
     _tcscpy_s(outBuffer, maxLen, TEXT("Balance $12,450.75"));
 
-    // Check absolute path to Monolith balance.json
-    FILE *f = fopen("C:/Users/auora/StudioProjects/Monolith-Games/src/Monolith/App_Data/balance.json", "r");
+    // Check absolute path to Monolith balance.json (use repo-relative fallback)
+    FILE *f = fopen("src/Monolith/App_Data/balance.json", "r");
     if (!f) {
         f = fopen("../Monolith/App_Data/balance.json", "r");
     }
